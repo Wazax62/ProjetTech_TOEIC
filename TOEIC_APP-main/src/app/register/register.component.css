@@ -1,0 +1,328 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+
+.container_register {
+    position: absolute;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #a8d8e7, #c0e3f5, #b5e1f0, #c9e9f7);
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+}
+
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.register {
+    border-radius: 20px;
+    height: 80%;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8); 
+    overflow: hidden; 
+    
+   
+}
+
+
+.logo_eilco {
+    position: absolute;
+    top: 2%;
+    left: 1%;
+    height: 50px;
+    width: 130px;
+    object-fit: contain;
+    z-index: 3;
+}
+
+
+.image_eilco {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative; 
+    overflow: hidden; 
+    border-top-left-radius: 20px; 
+    border-bottom-left-radius: 20px;
+}
+
+
+.image_campus {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease; 
+    border-radius: 20px; 
+}
+
+
+.image_campus:hover {
+    transform: scale(1.1); 
+   
+}
+
+
+.image_eilco::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3); 
+    border-radius: 20px;
+    pointer-events: none; 
+}
+
+.register_name {
+    font-family: "Jersey 15", serif;
+    font-weight: 600;
+    color: transparent;
+    font-size: 40px;
+    background: linear-gradient(120deg, #015292, #4a78a1);
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-webkit-contacts-auto-fill-button {
+  display: none;
+}
+
+.form_icon {
+    margin-right: 10px;
+    color: #015292;
+    font-size: 18px;
+  }
+
+  .toggle-password {
+    cursor: pointer;
+    color: #015292;
+    font-size: 14px;
+    transition: color 0.3s ease;
+  }
+  
+  .toggle-password:hover {
+    color: #4a78a1;
+  }
+
+
+
+.form_register {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.form2 {
+  
+    height: auto;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
+
+
+
+.form_group {
+    
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.form_group:hover {
+    border-color: #4a78a1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
+    color: #999;
+}
+
+
+.register_button {
+    margin-inline: 25%;
+    width: 50%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #015292;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+}
+
+
+.register_button:hover {
+    background-color: #4a78a1;
+    transform: scale(1.05);
+}
+
+
+.forgot_password a {
+    color: #015292;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot_password a:hover {
+    color: #4a78a1;
+}
+
+
+.create_account a {
+    color: #015292;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.create_account a:hover {
+    color: #4a78a1;
+}
+
+
+
+
+.status-message {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
+.status-message.success {
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb;
+}
+
+.error {
+    color: red; 
+    font-size: 12px;
+    
+}
+
+
+.form_group input.ng-invalid {
+    border-color: #e74c3c; 
+}
+
+.form_group input.ng-valid {
+    border-color: #2ecc71; 
+}
+
+
+.form_group {
+    margin-top: 15px;
+}
+
+
+.register_button {
+    margin-top: 20px;
+    background-color: #015292;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.register_button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+.link-container {
+    text-align: center; 
+  
+  }
+
+  .login-link {
+    color: #015292; 
+    text-decoration: none; 
+    font-weight: bold;
+    font-size: 16px; 
+    transition: color 0.3s ease; 
+    cursor: pointer;
+    text-decoration: underline; 
+  }
+
+  .login-link:hover {
+    color: #4a78a1; 
+    text-decoration: underline; 
+  }

@@ -1,0 +1,233 @@
+/* Style général */
+body {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  /* Carte */
+  .card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 400px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Titres */
+  h2 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  /* Champs de formulaire */
+  .form-control {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+  
+  .form-control:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 4px rgba(106, 17, 203, 0.4);
+    outline: none;
+  }
+  
+  /* Labels */
+  label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: block;
+  }
+  
+  /* Boutons */
+  .btn {
+    display: inline-block;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    position: relative; /* Nécessaire pour l'effet shine */
+    overflow: hidden;   /* Pour masquer l'animation en dehors du bouton */
+    transition: all 0.3s ease;
+    margin-top: 50px;
+  }
+  
+  /* Pour le bouton primaire, on conserve le texte en blanc */
+  .btn-primary {
+    background: linear-gradient(140deg, #2980b9, #2980b9);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.6);
+    color: #fff; /* On fixe la couleur du texte en hover à blanc */
+  }
+  
+  /* Pour le bouton secondaire, on fixe la couleur du texte en bleu */
+  .btn-secondary {
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    color: #007bff;
+    border: 2px solid #007bff;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+    color: #007bff; /* Maintenir la couleur du texte en bleu lors du survol */
+  }
+  
+  /* Style pour le bouton désactivé */
+  .btn-disabled {
+    background: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border: none;
+  }
+  
+  .btn-disabled:hover {
+    background: #cccccc;
+    color: #666666;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .btn-disabled::before {
+    display: none;
+  }
+  
+  /* Bouton update avec icône */
+  .btn-update {
+    background: linear-gradient(140deg, #2980b9, #3498db);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(41, 128, 185, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-update:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(41, 128, 185, 0.6);
+    color: #fff;
+  }
+  
+  .btn-update:focus {
+    outline: none;
+  }
+  
+  /* Bouton retour avec icône */
+  .btn-return {
+    background: linear-gradient(45deg, #fff, #f0f0f0);
+    color: #333;
+    border: 2px solid #ddd;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-return:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    color: #333;
+  }
+  
+  .btn-return:focus {
+    outline: none;
+  }
+  
+  /* Style pour l'icône du titre */
+  .title-icon {
+    margin-right: 10px;
+    
+    font-size: 1.2em;
+  }
+  
+  /* Effet "shine" avec pseudo-élément pour les deux boutons */
+  .btn-primary::before,
+  .btn-secondary::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: skewX(-20deg);
+    transition: all 0.5s ease;
+  }
+  
+  .btn-primary:hover::before,
+  .btn-secondary:hover::before {
+    left: 200%;
+  }
+  
+  /* Message d'erreur */
+  .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    animation: errorShake 0.5s ease-in-out;
+  }
+  
+  .error-message i {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+  
+  @keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .card {
+    animation: fadeIn 0.4s ease-out forwards;
+  }

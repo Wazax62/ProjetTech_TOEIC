@@ -1,0 +1,135 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <div class="form-container">
+    <h1 class="title">Mettre à jour un étudiant</h1>
+    
+    <form (ngSubmit)="updateStudent()" class="standard-form">
+      <!-- Nom, Prénom -->
+      <div class="row">
+        <div class="form-group half">
+          <label for="nom">
+            <i class="fas fa-user icon-label"></i> Nom
+          </label>
+          <input type="text" class="form-control" id="nom" [(ngModel)]="student.nom" name="nom" placeholder="Entrez le nom" required>
+          <div class="error-message" *ngIf="errors['nom']">
+            <i class="fas fa-exclamation-circle"></i> {{ errors['nom'] }}
+          </div>
+        </div>
+        <div class="form-group half">
+          <label for="prenom">
+            <i class="fas fa-user icon-label"></i> Prénom
+          </label>
+          <input type="text" class="form-control" id="prenom" [(ngModel)]="student.prenom" name="prenom" placeholder="Entrez le prénom" required>
+          <div class="error-message" *ngIf="errors['prenom']">
+            <i class="fas fa-exclamation-circle"></i> {{ errors['prenom'] }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Site -->
+      <div class="form-group">
+        <label for="site_id">
+          <i class="fas fa-map-marker-alt icon-label"></i> Site
+        </label>
+        <select class="form-control" id="site_id" [(ngModel)]="student.site_id" name="site_id" required (change)="onSiteChange(student.site_id)">
+          <option value="" disabled selected>Choisissez un site</option>
+          <option *ngFor="let site of sites" [value]="site.id" [selected]="site.id === student.site_id">
+            {{ site.nom }}
+          </option>
+        </select>
+        <div class="selected-value" *ngIf="student.site_id && sites.length > 0">
+          Site sélectionné: {{ getSiteName(student.site_id) }}
+        </div>
+        <div class="error-message" *ngIf="errors['site_id']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['site_id'] }}
+        </div>
+      </div>
+
+      <!-- Promotion -->
+      <div class="form-group">
+        <label for="promotion_id">
+          <i class="fas fa-graduation-cap icon-label"></i> Promotion
+        </label>
+        <select class="form-control" id="promotion_id" [(ngModel)]="student.promotion_id" name="promotion_id" required (change)="onPromotionChange(student.promotion_id)">
+          <option value="" disabled selected>Choisissez une promotion</option>
+          <option *ngFor="let promo of filteredPromotions" [value]="promo.id" [selected]="promo.id === student.promotion_id">
+            {{ promo.nom }}
+          </option>
+        </select>
+        <div class="selected-value" *ngIf="student.promotion_id && filteredPromotions.length > 0">
+          Promotion sélectionnée: {{ getPromotionName(student.promotion_id) }}
+        </div>
+        <div class="error-message" *ngIf="errors['promotion_id']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['promotion_id'] }}
+        </div>
+      </div>
+
+      <!-- Semestre -->
+      <div class="form-group">
+        <label for="semestre_id">
+          <i class="fas fa-calendar-alt icon-label"></i> Semestre
+        </label>
+        <select class="form-control" id="semestre_id" [(ngModel)]="student.semestre_id" name="semestre_id" required (change)="onSemestreChange(student.semestre_id)">
+          <option value="" disabled selected>Choisissez un semestre</option>
+          <option *ngFor="let semestre of filteredSemestres" [value]="semestre.id" [selected]="semestre.id === student.semestre_id">
+            {{ semestre.nom }}
+          </option>
+        </select>
+        <div class="selected-value" *ngIf="student.semestre_id && filteredSemestres.length > 0">
+          Semestre sélectionné: {{ getSemestreName(student.semestre_id) }}
+        </div>
+        <div class="error-message" *ngIf="errors['semestre_id']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['semestre_id'] }}
+        </div>
+      </div>
+
+      <!-- Groupe -->
+      <div class="form-group">
+        <label for="groupe_id">
+          <i class="fas fa-users icon-label"></i> Groupe
+        </label>
+        <select class="form-control" id="groupe_id" [(ngModel)]="student.groupe_id" name="groupe_id" required>
+          <option value="" disabled selected>Choisissez un groupe</option>
+          <option *ngFor="let groupe of filteredGroupes" [value]="groupe.id" [selected]="groupe.id === student.groupe_id">
+            {{ groupe.nom }}
+          </option>
+        </select>
+        <div class="selected-value" *ngIf="student.groupe_id && filteredGroupes.length > 0">
+          Groupe sélectionné: {{ getGroupeName(student.groupe_id) }}
+        </div>
+        <div class="error-message" *ngIf="errors['groupe_id']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['groupe_id'] }}
+        </div>
+      </div>
+
+      <!-- Spécialité -->
+      <div class="form-group">
+        <label for="specialite">
+          <i class="fas fa-code-branch icon-label"></i> Spécialité
+        </label>
+        <select class="form-control" id="specialite" [(ngModel)]="student.specialite" name="specialite" required>
+          <option value="" disabled selected>Choisissez une spécialité</option>
+          <option *ngFor="let specialite of specialites" [value]="specialite" [selected]="specialite === student.specialite">
+            {{ specialite }}
+          </option>
+        </select>
+        <div class="selected-value" *ngIf="student.specialite">
+          Spécialité sélectionnée: {{ student.specialite }}
+        </div>
+        <div class="error-message" *ngIf="errors['specialite']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['specialite'] }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [ngClass]="{'btn': true, 'btn-update': isFormFilled(), 'btn-disabled': !isFormFilled()}" [disabled]="!isFormFilled()">
+          <i class="fas fa-save"></i> Mettre à jour
+        </button>
+        <button type="button" class="btn btn-return" [routerLink]="['/studentlist']">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

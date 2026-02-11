@@ -1,0 +1,213 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <h1 class="title">Liste des Évaluations</h1>
+  
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher une évaluation..." />
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#aaa">
+      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+    </svg>
+  </div>
+
+  <!-- Conteneur principal avec grille pour les cartes -->
+  <div class="grid-card-container">
+    <!-- Utilisation de la classe fancy-card pour chaque carte -->
+    <div class="card fancy-card" *ngFor="let evaluation of filteredEvaluations">
+      <div class="card-body">
+        <h3 class="card-title">{{ evaluation.test_title }}</h3>
+        
+        <p class="card-group">
+          Évaluation TOEIC pour le groupe {{ evaluation.groupe_name }}
+        </p>
+        
+        <!-- Réintégration de la description du test -->
+        <p *ngIf="evaluation.test_description" class="card-description">
+          {{ evaluation.test_description }}
+        </p>
+        
+        <p class="card-date">
+          {{ evaluation.test_date | date:'dd/MM/yyyy' }}
+        </p>
+        
+        <!-- Les boutons sont maintenant empilés sur mobile -->
+        <div class="card-actions">
+          <button class="btn-action btn-download" 
+                [id]="'btn-' + evaluation.test_id + '-' + evaluation.groupe_id"
+                (click)="viewResponseSheet(evaluation.test_id, evaluation.groupe_id)"
+                [disabled]="loadingButtonId === 'btn-' + evaluation.test_id + '-' + evaluation.groupe_id">
+            <i class="fas fa-download"></i>
+            <span>Télécharger</span>
+          </button>
+          
+          <button class="btn-action btn-correct" 
+                (click)="openUploadModal(evaluation)"
+                [disabled]="!evaluation.feuille_generee">
+            <i class="fas fa-check-circle"></i>
+            <span>Corriger</span>
+          </button>
+          
+          <button class="btn-action btn-copy" (click)="openDuplicateModal(evaluation)">
+            <i class="fas fa-copy"></i>
+            <span>Dupliquer</span>
+          </button>
+          
+          <button class="btn-action btn-delete" (click)="deleteEvaluation(evaluation.test_id)">
+            <i class="fas fa-trash"></i>
+            <span>Supprimer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Message quand aucune évaluation n'est trouvée -->
+    <div *ngIf="filteredEvaluations.length === 0" class="no-evaluations">
+      <p>Aucune évaluation trouvée.</p>
+    </div>
+  </div>
+</div>
+
+<!-- BACKDROP Corriger (upload PDF) -->
+<div *ngIf="showModal" class="modal-backdrop-blur"></div>
+
+<!-- MODAL Corriger (upload PDF) -->
+<div *ngIf="showModal" class="custom-modal">
+  <div class="modal-header">
+    <h2 class="modal-title">Téléverser Votre Fichier PDF</h2>
+    <button type="button" class="close" aria-label="Close" (click)="showModal = false">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="onSubmit(); showModal = false" novalidate>
+      <div class="form-group">
+        <label for="file">Sélectionnez un fichier PDF</label>
+        <input
+          type="file"
+          class="form-control-file"
+          id="file"
+          (change)="onFileChange($event)"
+          accept=".pdf"
+          required
+        />
+      </div>
+      <button 
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isLoading"
+        (click)="uploadPdf(selectedEvaluation.test_id, selectedEvaluation.groupe_id)"
+      >
+        <span *ngIf="!isLoading">Téléverser</span>
+        <span *ngIf="isLoading">Téléversement en cours...</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- BACKDROP Duplication -->
+<div *ngIf="showDuplicateModal" class="modal-backdrop-blur"></div>
+
+<!-- MODAL DUPLICATION -->
+<div *ngIf="showDuplicateModal" class="custom-modal">
+  <div class="modal-header">
+    <h2 class="modal-title">Dupliquer le Test</h2>
+    <button type="button" class="close" aria-label="Close" (click)="showDuplicateModal = false">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <form (ngSubmit)="submitDuplicateForm()" #dupForm="ngForm">
+      <!-- Nom -->
+      <div class="form-group">
+        <label>Nom du test</label>
+        <input
+          type="text"
+          [(ngModel)]="duplicateForm.nom"
+          name="nom"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          [(ngModel)]="duplicateForm.description"
+          name="description"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label>Date du test</label>
+        <input
+          type="datetime-local"
+          [(ngModel)]="duplicateForm.date"
+          name="date"
+          class="form-control"
+        />
+      </div>
+
+      <!-- Site -->
+      <div class="form-group">
+        <label>Site</label>
+        <select
+          [(ngModel)]="duplicateForm.site_id"
+          name="site_id"
+          class="form-control"
+        >
+          <option [ngValue]="null">--- Choisir un site ---</option>
+          <option *ngFor="let s of sites" [value]="s.id">{{ s.nom }}</option>
+        </select>
+      </div>
+
+      <!-- Promotions -->
+      <div class="form-group">
+        <label>Promotions</label>
+        <select
+          [(ngModel)]="duplicateForm.promotions_ids"
+          name="promotions_ids"
+          class="form-control"
+          multiple
+        >
+          <option *ngFor="let p of promotions" [value]="p.id">{{ p.nom }}</option>
+        </select>
+      </div>
+
+      <!-- Groupes -->
+      <div class="form-group">
+        <label>Groupes</label>
+        <select
+          [(ngModel)]="duplicateForm.groupes_ids"
+          name="groupes_ids"
+          class="form-control"
+          multiple
+        >
+          <option *ngFor="let g of groupes" [value]="g.id">{{ g.nom }}</option>
+        </select>
+      </div>
+
+      <!-- Copier le corrigé ? -->
+      <div class="form-check">
+        <input
+          type="checkbox"
+          class="form-check-input"
+          id="copyReponsesProf"
+          [(ngModel)]="duplicateForm.copyReponsesProf"
+          name="copyReponsesProf"
+        />
+        <label class="form-check-label" for="copyReponsesProf">
+          Copier les réponses prof (corrigé) ?
+        </label>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Dupliquer</button>
+      </div>
+    </form>
+  </div>
+</div>

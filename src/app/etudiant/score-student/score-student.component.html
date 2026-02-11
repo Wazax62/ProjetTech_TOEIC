@@ -1,0 +1,104 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <!-- En-tête avec titre, boutons et filtres -->
+      <div class="filters-container">
+        <div class="header-with-buttons">
+          <h2>Résultats TOEIC des Étudiants</h2>
+          <div class="buttons-container">
+            <!-- Bouton Télécharger CSV -->
+            <button class="btn btn-download-csv" (click)="exportTableToCSV('toeic_results.csv')">
+              <i class="fas fa-download"></i> Télécharger CSV
+            </button>
+            <button class="btn btn-download-pdf" (click)="downloadOralPDF()">
+              <i class="fas fa-file-pdf"></i> Télécharger PDF Oral
+            </button>
+            <button class="btn btn-download-pdf" (click)="downloadEcritPDF()">
+              <i class="fas fa-file-pdf"></i> Télécharger PDF Écrit
+            </button>
+          </div>
+        </div>
+        <div class="filters-grid">
+          <!-- Première ligne de filtres -->
+          <div class="filter-row">
+            <!-- Liste déroulante des sites -->
+            <select class="form-control search-bar" id="siteFilter" (change)="onSiteChange($event)">
+              <option value="">Sélectionner un site</option>
+              <option *ngFor="let site of sites" [value]="site.id">{{ site.nom }}</option>
+            </select>
+
+            <!-- Liste déroulante des promotions -->
+            <select class="form-control search-bar" id="promoFilter" (change)="onPromotionChange($event)">
+              <option value="">Sélectionner une promotion</option>
+              <option *ngFor="let promotion of promotions" [value]="promotion.id">{{ promotion.nom }}</option>
+            </select>
+          </div>
+
+          <!-- Deuxième ligne de filtres -->
+          <div class="filter-row">
+            <!-- Liste déroulante des semestres -->
+            <select class="form-control search-bar" id="semestreFilter" (change)="onSemestreChange($event)">
+              <option value="">Sélectionner un semestre</option>
+              <option *ngFor="let semestre of semestres" [value]="semestre.id">{{ semestre.nom }}</option>
+            </select>
+
+            <!-- Liste déroulante des groupes -->
+            <select class="form-control search-bar" id="groupFilter" (change)="onGroupeChange($event)">
+              <option value="">Sélectionner un groupe</option>
+              <option *ngFor="let groupe of groupes" [value]="groupe.id">{{ groupe.nom }}</option>
+            </select>
+          </div>
+
+          <!-- Troisième ligne de filtres -->
+          <div class="filter-row">
+            <!-- Liste déroulante des tests (dynamique) -->
+            <select class="form-control search-bar" id="testFilter">
+              <option value="">Sélectionner un test</option>
+              <option *ngFor="let test of tests" [value]="test.id">{{ test.nom }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bouton Score avec icône d'œil -->
+      <button class="btn btn-score" (click)="showResultsTable()">
+        <i class="fas fa-eye"></i> Score
+      </button>
+
+      <!-- Tableau des résultats TOEIC -->
+      <!-- Tableau des résultats TOEIC -->
+<table *ngIf="showTable" class="table table-flat" id="resultsTable">
+  <thead>
+    <tr>
+      <th>Nom</th>
+      <th>Prénom</th>
+      <th>H2 Oral (/100)</th>
+      <th>Note Oral /20</th>
+      <th>Score Oral</th>
+      <th>H2 Écrit (/100)</th>
+      <th>Note Écrit /20</th>
+      <th>Score Écrit</th>
+      <th>Score Total TOEIC</th>
+      <th>Note C.C</th>
+      <th>Note ECUE TOEIC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let student of students">
+      <td>{{ student.nom }}</td>
+      <td>{{ student.prenom }}</td>
+      <td>{{ student.h2_oral }}</td>
+      <td>{{ student.note_oral }}</td>
+      <td>{{ student.score_oral }}</td>
+      <td>{{ student.h2_ecrit }}</td>
+      <td>{{ student.note_ecrit }}</td>
+      <td>{{ student.score_ecrit }}</td>
+      <td>{{ student.score_total_toeic }}</td>
+      <td>{{ student.note_cc }}</td>
+      <td>{{ student.note_ecue_toeic }}</td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+  </div>
+</div>

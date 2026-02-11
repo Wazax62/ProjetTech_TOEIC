@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+<div class="container test-groupe-container">
+  <div class="header-section">
+    <a routerLink="/addgroup" class="btn btn-secondary">Ajouter Groupe</a>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher un groupe..." />
+  </div>
+
+  <div class="group-list">
+    <!-- S'il y a des groupes à afficher -->
+    <ng-container *ngIf="filteredGroupes.length > 0; else noGroups">
+      <div class="group-card" *ngFor="let group of filteredGroupes">
+        <div class="group-info">
+          <h2>{{ group.nom }}</h2>
+          <p><strong>Promotion:</strong> {{ group.promotion }}</p>
+          <p><strong>Site:</strong> {{ group.site }}</p>
+          <p><strong>Semestre:</strong> {{ group.semestre }}</p>
+          <p><strong>Nombre de tests:</strong> {{ group.nombre_tests }}</p>
+          <p><strong>Nombre d'étudiants:</strong> {{ group.nombre_etudiants }}</p>
+        </div>
+        <div class="group-selection">
+          <input 
+            type="checkbox" 
+            id="group-{{ group.id_groupe }}"
+            [checked]="group.selected"
+            [(ngModel)]="group.selected" 
+            [name]="'group' + group.id_groupe" 
+          />
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Template alternative si aucun groupe -->
+    <ng-template #noGroups>
+      <div class="group-card">
+        <div class="group-info">
+          <h2>Pas de groupe pour ce site</h2>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="text-center mt-4">
+    <button class="btn btn-primary" (click)="onSubmitSelection()">Confirmer la sélection</button>
+  </div>
+</div>

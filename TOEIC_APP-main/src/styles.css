@@ -1,0 +1,71 @@
+body{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* You can add global styles to this file, and also import other style files
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    background-color: #004F9F;
+    padding: 10px;
+    color: white;
+  }
+  .logo {
+    height: 40px;
+  }
+  nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+  }
+  nav a.active {
+    text-decoration: underline;
+  }
+  .logout-btn {
+    background-color: #FF0000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  table tr:hover {
+    background-color: #f1f1f1;
+  }
+  button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    opacity: 0.8;
+  }
+<<<<<<< HEAD
+  
+=======
+   */
+>>>>>>> safa_branch

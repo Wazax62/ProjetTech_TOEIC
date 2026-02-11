@@ -1,0 +1,65 @@
+<app-navbar></app-navbar>  
+
+<div class="container my-5">
+  <h1 class="title"><i class="fas fa-user-graduate title-icon"></i>Liste des Promotions</h1>
+  
+  <!-- Barre de recherche améliorée -->
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher une promotion..." />
+  </div>
+  
+  <!-- Boutons d'action -->
+  <div class="action-row">
+    <div class="same">
+      <button class="btn-add" routerLink="/addpromo">
+        <i class="fas fa-plus"></i> Ajouter une Promotion
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteneur de cards -->
+  <div class="grid-card-container">
+    <!-- Boucle sur les promotions filtrées -->
+    <div class="fancy-card" *ngFor="let promotion of filteredPromotions">
+      <div class="card-body">
+        <!-- Titre (nom de la promotion) -->
+        <h3 class="card-title">{{ promotion.nom }}</h3>
+
+        <!-- Informations sur la promotion -->
+        <p class="card-group"><i class="fas fa-map-marker-alt"></i> Site: {{ promotion.site }}</p>
+
+        <!-- Boutons d'action -->
+        <div class="card-actions">
+          <a [routerLink]="['/updatepromo', promotion.id]" class="btn-action btn-correct">
+            <i class="fas fa-edit"></i>
+            <span>Modifier</span>
+          </a>
+          <button class="btn-action btn-delete" (click)="deletePromotion(promotion.id)">
+            <i class="fas fa-trash"></i>
+            <span>Supprimer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune promotion trouvée -->
+    <div *ngIf="filteredPromotions && filteredPromotions.length === 0" class="no-evaluations">
+      <p>Aucune promotion trouvée.</p>
+    </div>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="pagination-controls">
+    <div class="pagination-buttons">
+      <button class="btn-pagination" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fas fa-chevron-left"></i> Précédent
+      </button>
+      <button class="btn-pagination" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Suivant <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="pagination-info">
+      Page {{ currentPage }} sur {{ totalPages }}
+    </div>
+  </div>
+</div>

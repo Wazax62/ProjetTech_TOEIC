@@ -1,0 +1,74 @@
+
+<section class="container_register">
+  <img src="assets/images/eilco_logo.png" alt="eilco_logo" class="logo_eilco" />
+  
+  <section class="register">
+    <div class="image_eilco">
+      <img src="assets/images/eilco_calais.jpg" alt="image_campus" class="image_campus" />
+    </div>
+    <div class="form_register">
+      <div class="register_name">Register</div>
+      <form (ngSubmit)="register()" class="form2">
+
+        <div *ngIf="statusMessage" [ngClass]="{'success': messageType === 'success', 'error': messageType === 'error'}" class="status-message">
+          {{ statusMessage }}
+        </div>
+
+        <!-- <div class="form_row"> -->
+          <div>
+
+            <div class="form_group">
+               <input [(ngModel)]="firstName"  name="firstName" type="text" placeholder="First Name" required  (ngModelChange)="validateFirstName()"/>
+            </div>
+          <small *ngIf="errors.firstName" class="error">{{ errors.firstName }}</small>
+
+        </div>
+          <div class="form_group">
+            <input [(ngModel)]="lastName"  name="lastName" type="text" placeholder="Last Name" required (ngModelChange)= "validateLastName()"/>
+          </div>
+          <small *ngIf="errors.lastName" class="error">{{ errors.lastName }}</small>
+        <!-- </div> -->
+        <div>
+          <div class="form_group">
+            <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required (ngModelChange)="validateEmail()"/>
+          </div>
+          <small *ngIf="errors.email" class="error">{{ errors.email }}</small>
+        </div>
+        <!-- <div class="form_row"> -->
+          <div>
+          <div class="form_group">
+            <input [(ngModel)]="password" name="password" [type]="passwordFieldType" placeholder="Password" required (ngModelChange)="validatePassword()"/>
+            <i class="fas toggle-password" 
+                   [class.fa-eye]="passwordFieldType === 'password'" 
+                   [class.fa-eye-slash]="passwordFieldType === 'text'" 
+                   (click)="togglePasswordVisibility()"></i>
+          </div>
+          <small *ngIf="errors.password" class="error">{{ errors.password }}</small>
+        </div>
+        <div>
+          <div class="form_group">
+            <input [type]="passwordFieldType" [(ngModel)]="confirmPassword" name="confirmPassword"  placeholder="Confirm Password" required (ngModelChange)="validateConfirmPassword()"/>
+            <i class="fas toggle-password" 
+                   [class.fa-eye]="passwordFieldType === 'password'" 
+                   [class.fa-eye-slash]="passwordFieldType === 'text'" 
+                   (click)="togglePasswordVisibility()"></i>
+          </div>
+          <small *ngIf="errors.confirmPassword" class="error">{{ errors.confirmPassword }}</small>
+        </div>
+      <!-- </div> -->
+      
+        <button type="submit" [disabled]="!formValid" class="register_button">Register</button>
+      </form>
+      <small *ngIf="errorMessage" class="error">{{ errorMessage }}</small>
+
+
+      <div class="link-container">
+        <a (click)="navigateToLogin()" class="login-link">Login</a>
+
+      </div>
+      
+
+    </div>
+  </section>
+</section>
+

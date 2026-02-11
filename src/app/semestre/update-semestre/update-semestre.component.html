@@ -1,0 +1,56 @@
+<app-navbar></app-navbar>
+<div class="container my-5">
+  <div class="form-card">
+    <h1 class="title">Modifier le Semestre</h1>
+    
+    <form (ngSubmit)="updateSemestre()">
+      <!-- Liste déroulante des sites -->
+      <div class="form-group">
+        <label for="siteFilter">Site</label>
+        <select class="form-control" id="siteFilter" 
+                [(ngModel)]="siteId" 
+                name="siteId" 
+                (change)="onSiteChange($event)" 
+                required>
+          <option value="">Sélectionner un site</option>
+          <option *ngFor="let site of sites" [value]="site.id">
+            {{ site.nom }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="errors['siteId']">{{ errors['siteId'] }}</div>
+      </div>
+
+      <!-- Liste déroulante des promotions (filtrées par site) -->
+      <div class="form-group">
+        <label for="promotionId">Promotion</label>
+        <select class="form-control" id="promotionId" 
+                [(ngModel)]="promotionId" 
+                name="promotionId" 
+                required>
+          <option value="">Sélectionner une promotion</option>
+          <option *ngFor="let promotion of promotions" [value]="promotion.id">
+            {{ promotion.nom }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="errors['promotionId']">{{ errors['promotionId'] }}</div>
+      </div>
+
+      <!-- Nom du semestre -->
+      <div class="form-group">
+        <label for="semestreNom">Nom du Semestre</label>
+        <input type="text" class="form-control" id="semestreNom" 
+               [(ngModel)]="semestreNom" 
+               name="semestreNom" 
+               required>
+        <div class="error-message" *ngIf="errors['semestreNom']">{{ errors['semestreNom'] }}</div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        <button type="button" class="btn btn-secondary" [routerLink]="['/semestre']">Retour</button>
+      </div>
+
+      <div class="error-message" *ngIf="errors['general']">{{ errors['general'] }}</div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,158 @@
+/* ======= Reset / Base ======= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Corps de page */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fc;
+    color: #2c3e50;
+  }
+  
+  /* Conteneur principal */
+  .container {
+    max-width: 50%;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  
+  /* Carte du formulaire */
+  .form-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .form-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  }
+  
+  /* Titre */
+  .title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    color: #2c3e50;
+  }
+  
+  /* Structure du formulaire */
+  .form-group {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  
+  /* Labels */
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  /* Inputs et selects */
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+  
+  .form-input:focus {
+    border-color: #1890cc;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(24, 144, 204, 0.2);
+  }
+  
+  /* Style spécifique pour les selects */
+  select.form-input {
+    appearance: none;
+    padding-right: 30px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231890cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+    background-size: 16px;
+  }
+  
+  /* Messages d'erreur */
+  .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    padding: 8px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+  }
+  
+  /* Boutons */
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+  }
+  
+  .btn {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .btn-update {
+    background-color: #1890cc;
+    color: #fff;
+  }
+  
+  .btn-update:hover {
+    background-color: #0d5892;
+    transform: translateY(-2px);
+  }
+  
+  .btn-return {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  .btn-return:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+  }
+  
+  /* Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .form-card {
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      max-width: 90%;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+    }
+    
+    .form-card {
+      padding: 20px;
+    }
+  }

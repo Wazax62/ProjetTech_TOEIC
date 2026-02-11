@@ -1,0 +1,54 @@
+<section class="container_login">
+  <img src="assets/images/eilco_logo.png" alt="eilco_logo" class="logo_eilco" />
+  
+  <section class="login">
+      <div class="image_eilco">
+          <img src="assets/images/eilco_calais.jpg" alt="image_campus" class="image_campus" />
+      </div>
+      
+      <div class="form_login">
+          <div class="login_name">Login</div>
+
+          <!-- Message de statut -->
+          <div *ngIf="statusMessage" [ngClass]="{'success': messageType === 'success', 'error': messageType === 'error'}" class="status-message">
+            {{ statusMessage }}
+          </div>
+  
+          <!-- Formulaire de connexion -->
+          <form (ngSubmit)="login()" class="form">
+            <div>
+            <div class="form_group">
+                <i class="fas fa-envelope form_icon"></i>
+                <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required (ngModelChange)="validateEmail()" />
+               
+            </div>
+            <small *ngIf="errors.email" class="error_login">{{ errors.email }}</small>
+          </div>
+
+            <div>
+            <div class="form_group">
+                <i class="fas fa-lock form_icon"></i>
+                <input [(ngModel)]="password" name="password" [type]="passwordFieldType" placeholder="Password" id="password" required (ngModelChange)="validatePassword()" />
+                <i class="fas toggle-password" 
+                   [class.fa-eye]="passwordFieldType === 'password'" 
+                   [class.fa-eye-slash]="passwordFieldType === 'text'" 
+                   (click)="togglePasswordVisibility()"></i>
+               
+            </div>
+            <small *ngIf="errors.password" class="error_login">{{ errors.password }}</small>
+          </div>
+        
+            <button type="submit" [disabled]="!formValid" class="login_button">Login</button>
+            
+            
+            <div class="create_account">
+                <a href="#" class="Register-link">Forgot your password?</a>
+            </div>
+        
+            <div class="create_account">
+                <a (click)="navigateToRegister()" class="Register-link">Create an account</a>
+            </div>
+        </form>
+      </div>
+  </section>
+</section>

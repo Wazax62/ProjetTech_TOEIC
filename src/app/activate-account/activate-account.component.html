@@ -1,0 +1,52 @@
+<div class="activation-container">
+  <div class="activation-card">
+
+    <!-- Logo de l'école -->
+    <div class="logo-container">
+      <img src="assets/images/eilco_logo.png" alt="EILCO Logo" class="logo" />
+    </div>
+    
+    <!-- Animation de vérification -->
+    <div class="verification-animation">
+      <!-- Loader pendant le chargement -->
+      <div *ngIf="loading" class="loader"></div>
+      
+      <!-- Vérification réussie -->
+      <div *ngIf="!loading && messageType === 'success'" class="success-checkmark">
+        <div class="check-icon">
+          <span class="icon-line line-tip"></span>
+          <span class="icon-line line-long"></span>
+          <div class="icon-circle"></div>
+          <div class="icon-fix"></div>
+        </div>
+      </div>
+      
+      <!-- Erreur -->
+      <div *ngIf="!loading && messageType === 'error'" class="error-x">
+        <div class="x-icon">
+          <span class="icon-line line-left"></span>
+          <span class="icon-line line-right"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message de statut -->
+    <div class="status-message" [ngClass]="messageType">
+      <h2>{{ messageType === 'success' ? 'Activation Réussie' : 'Échec de l\'activation' }}</h2>
+      <p>{{ statusMessage }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <!-- Bouton "Se connecter" en cas de succès -->
+      <button *ngIf="messageType === 'success'" class="action-button primary" (click)="navigateToLogin()">Se connecter</button>
+      
+      <!-- Bouton "Réessayer" en cas d'erreur -->
+      <button *ngIf="messageType === 'error'" class="action-button secondary" (click)="tryAgain()">Réessayer</button>
+      
+      <!-- Bouton "Retour à l'accueil" -->
+      <button class="action-button tertiary" (click)="navigateToHome()">Retour à l'accueil</button>
+    </div>
+    
+  </div>
+</div>

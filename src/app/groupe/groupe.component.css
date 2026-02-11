@@ -1,0 +1,379 @@
+/* ======= Reset / Base ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Corps de page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fc;
+  color: #2c3e50;
+}
+
+/* Container principal de la page */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Titre principal */
+.title {
+  text-align: center;
+  margin: 30px 0;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Barre de recherche stylisée comme celle des évaluations */
+.search-bar {
+  display: flex;
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 30px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 15px 20px 15px 60px;
+  border-radius: 50px;
+  border: 1px solid #eee;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.search-bar input:focus {
+  outline: none;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  border-color: #4285f4;
+}
+
+/* Ajout d'un pseudo-élément pour l'icône de recherche */
+.search-bar::before {
+  content: "\f002";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 16px;
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+.search-bar input:focus + .search-bar::before {
+  color: #4285f4;
+}
+
+/* Action Row (Search + Add Buttons) */
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 30px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.same {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-add {
+  background-color: #1890cc;
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-add i {
+  font-size: 1rem;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ====================== CARTES DES GROUPES ====================== */
+
+/* Conteneur de cartes */
+.grid-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 30px;
+  padding: 20px;
+}
+
+/* Style des cartes */
+.fancy-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  padding: 20px;
+  position: relative;
+}
+
+.fancy-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, rgba(220, 230, 255, 0.3), rgba(255, 220, 230, 0.3));
+  border-radius: 0 0 0 100%;
+  z-index: 0;
+}
+
+.fancy-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.card-group {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 10px;
+}
+
+.card-group i {
+  width: 20px;
+  text-align: center;
+  color: #555;
+}
+
+/* Styles des boutons */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  color: white;
+  text-decoration: none;
+  /* Arrangement horizontal sur écrans larges */
+  max-width: 100%;
+}
+
+/* Sur écrans plus grands que mobile, on affiche 2 boutons par ligne */
+@media (min-width: 577px) {
+  .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+}
+
+/* Couleurs des boutons */
+.btn-correct {
+  background: #84CC16;
+}
+
+.btn-correct:hover:not(:disabled) {
+  background: #65A30D;
+}
+
+.btn-delete {
+  background: #EF4444;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #DC2626;
+}
+
+.btn-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Message aucun groupe */
+.no-evaluations {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-pagination {
+  background-color: white;
+  color: #1890cc;
+  border: 1px solid #1890cc;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-pagination:hover {
+  background-color: #1890cc;
+  color: white;
+}
+
+.btn-pagination:disabled {
+  background-color: #f2f2f2;
+  color: #6c757d;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .same {
+    width: 100%;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .grid-card-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 10px;
+  }
+
+  .fancy-card {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-buttons {
+    order: 2;
+  }
+
+  .pagination-info {
+    order: 1;
+    text-align: center;
+  }
+}
+
+/* Pour les très petits écrans */
+@media (max-width: 360px) {
+  .fancy-card {
+    padding: 12px;
+  }
+  
+  .card-title {
+    font-size: 1.2rem;
+  }
+  
+  .btn-action {
+    padding: 8px 0;
+    font-size: 0.85rem;
+  }
+}

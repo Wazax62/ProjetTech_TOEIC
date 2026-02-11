@@ -1,0 +1,221 @@
+/* Styles de base */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1, h2 {
+    color: #004F9F;
+    margin-bottom: 15px;
+  }
+  
+  /* Formulaire */
+  form {
+    margin-bottom: 30px;
+  }
+  
+  form div {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  form input,
+  form select,
+  form button {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  form input:focus,
+  form select:focus,
+  form button:focus {
+    border-color: #004F9F;
+    outline: none;
+  }
+  
+  form button {
+    background-color: #004F9F;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  form button:hover {
+    background-color: #0073E6;
+  }
+  
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  table th, table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #004F9F;
+    color: white;
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  table button {
+    padding: 5px 10px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  table button:first-child {
+    background-color: #004F9F;
+    color: white;
+  }
+  
+  table button:first-child:hover {
+    background-color: #0073E6;
+  }
+  
+  table button:last-child {
+    background-color: #FF4C4C;
+    color: white;
+  }
+  
+  table button:last-child:hover {
+    background-color: #FF6B6B;
+  }
+  
+  /* Section de téléchargement */
+  h2 {
+    margin-top: 30px;
+  }
+  
+  input[type="file"] {
+    margin: 10px 0;
+  }
+  
+  button.upload-btn {
+    background-color: #00AEEF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.upload-btn:hover {
+    background-color: #0073E6;
+  }
+  
+  /* Résultats du traitement */
+  pre {
+    background-color: #f4f4f4;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    overflow-x: auto;
+  }
+  
+  /* Réactif pour les petits écrans */
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px;
+    }
+  
+    table th, table td {
+      font-size: 12px;
+    }
+  
+    form input,
+    form select,
+    form button {
+      font-size: 12px;
+      padding: 8px;
+    }
+  
+    form div {
+      margin-bottom: 10px;
+    }
+  }
+  
+
+  .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #004F9F;
+    margin-bottom: 15px;
+  }
+  
+  form {
+    margin-bottom: 30px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background-color: #004F9F;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0073E6;
+  }
+  

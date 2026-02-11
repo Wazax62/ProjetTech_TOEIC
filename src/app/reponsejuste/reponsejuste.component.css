@@ -1,0 +1,102 @@
+/* Importation de la police Roboto */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Conteneur principal */
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Titre principal */
+h1 {
+  text-align: center;
+  color: #1890cc;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+/* Grid layout pour afficher les questions en grille */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.grid-item {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+}
+
+.question-label {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Style pour le groupe de boutons radio */
+.radio-group {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  color: #0d5892;
+}
+
+.radio-label input {
+  margin-right: 4px;
+}
+
+/* Bouton principal */
+.btn-primary {
+  background-color: #1890cc;
+  border: none;
+  color: #fff;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #0d5892;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  background-color: #74a3c2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .btn-primary {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}

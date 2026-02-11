@@ -1,0 +1,62 @@
+<app-navbar></app-navbar>
+<div class="container my-5">
+  <div class="form-container">
+    <h1 class="title"><i class="fas fa-calendar-plus title-icon"></i> Ajouter un Semestre</h1>
+    
+    <form (ngSubmit)="addSemestre()" class="standard-form">
+      <!-- Liste déroulante des sites -->
+      <div class="form-group">
+        <label for="siteFilter">
+          <i class="fas fa-building icon-label"></i> Site
+        </label>
+        <select class="form-input" id="siteFilter" [(ngModel)]="siteId" 
+                name="siteId" (change)="onSiteChange($event)" required>
+          <option value="" disabled selected>Sélectionner un site</option>
+          <option *ngFor="let site of sites" [value]="site.id">{{ site.nom }}</option>
+        </select>
+        <div class="error-message" *ngIf="errors['siteId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['siteId'] }}
+        </div>
+      </div>
+
+      <!-- Liste déroulante des promotions (filtrées par site) -->
+      <div class="form-group">
+        <label for="promotionId">
+          <i class="fas fa-graduation-cap icon-label"></i> Promotion
+        </label>
+        <select class="form-input" id="promotionId" [(ngModel)]="promotionId" 
+                name="promotionId" required>
+          <option value="" disabled selected>Sélectionner une promotion</option>
+          <option *ngFor="let promotion of promotions" [value]="promotion.id">
+            {{ promotion.nom }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="errors['promotionId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['promotionId'] }}
+        </div>
+      </div>
+
+      <!-- Nom du semestre -->
+      <div class="form-group">
+        <label for="semestreNom">
+          <i class="fas fa-calendar-alt icon-label"></i> Nom du Semestre
+        </label>
+        <input type="text" class="form-input" id="semestreNom" 
+               [(ngModel)]="semestreNom" name="semestreNom" required
+               placeholder="Exemple: S5, S6">
+        <div class="error-message" *ngIf="errors['semestreNom']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['semestreNom'] }}
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" [ngClass]="{'btn': true, 'btn-update': isFormFilled(), 'btn-disabled': !isFormFilled()}" [disabled]="!isFormFilled()">
+          <i class="fas fa-plus-circle"></i> Ajouter
+        </button>
+        <button type="button" class="btn btn-return" [routerLink]="['/semestre']">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

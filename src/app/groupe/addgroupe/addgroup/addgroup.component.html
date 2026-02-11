@@ -1,0 +1,93 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <div class="form-container">
+    <h1 class="title">Ajouter un Groupe</h1>
+    
+    <form (ngSubmit)="addGroup()" class="standard-form">
+      <!-- Nom du Groupe -->
+      <div class="form-group">
+        <label for="groupName">
+          <i class="fas fa-users icon-label"></i> Nom du Groupe
+        </label>
+        <input type="text" class="form-control" id="groupName" [(ngModel)]="groupName" name="groupName" placeholder="Entrez le nom du groupe" required>
+        <div class="error-message" *ngIf="errors['groupName']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['groupName'] }}
+        </div>
+      </div>
+
+      <!-- Site (Liste déroulante) -->
+      <div class="form-group">
+        <label for="groupSiteId">
+          <i class="fas fa-map-marker-alt icon-label"></i> Site
+        </label>
+        <select class="form-control" id="groupSiteId" [(ngModel)]="groupSiteId" name="groupSiteId" (change)="onSiteChange(groupSiteId)" required>
+          <option value="" disabled selected>Choisissez un site</option>
+          <option *ngFor="let site of sites" [value]="site.id">{{ site.nom }}</option>
+        </select>
+        <div class="selected-value" *ngIf="groupSiteId && sites.length > 0">
+          Site sélectionné: {{ getSiteName(groupSiteId) }}
+        </div>
+        <div class="error-message" *ngIf="errors['groupSiteId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['groupSiteId'] }}
+        </div>
+      </div>
+
+      <!-- Promotion (Liste déroulante) -->
+      <div class="form-group">
+        <label for="groupPromotionId">
+          <i class="fas fa-graduation-cap icon-label"></i> Promotion
+        </label>
+        <select class="form-control" id="groupPromotionId" [(ngModel)]="groupPromotionId" name="groupPromotionId" (change)="onPromotionChange(groupPromotionId)" required>
+          <option value="" disabled selected>Choisissez une promotion</option>
+          <option *ngFor="let promo of filteredPromotions" [value]="promo.id">{{ promo.nom }}</option>
+        </select>
+        <div class="selected-value" *ngIf="groupPromotionId && filteredPromotions.length > 0">
+          Promotion sélectionnée: {{ getPromotionName(groupPromotionId) }}
+        </div>
+        <div class="error-message" *ngIf="errors['groupPromotionId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['groupPromotionId'] }}
+        </div>
+      </div>
+
+      <!-- Semestre (Liste déroulante) -->
+      <div class="form-group">
+        <label for="groupSemestreId">
+          <i class="fas fa-calendar-alt icon-label"></i> Semestre
+        </label>
+        <select class="form-control" id="groupSemestreId" [(ngModel)]="groupSemestreId" name="groupSemestreId" required>
+          <option value="" disabled selected>Choisissez un semestre</option>
+          <option *ngFor="let semestre of filteredSemestres" [value]="semestre.id">{{ semestre.nom }}</option>
+        </select>
+        <div class="selected-value" *ngIf="groupSemestreId && filteredSemestres.length > 0">
+          Semestre sélectionné: {{ getSemestreName(groupSemestreId) }}
+        </div>
+        <div class="error-message" *ngIf="errors['groupSemestreId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['groupSemestreId'] }}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [ngClass]="{'btn': true, 'btn-primary': isFormFilled(), 'btn-disabled': !isFormFilled()}" [disabled]="!isFormFilled()">
+          <i class="fas fa-plus-circle"></i> Ajouter
+        </button>
+        <button type="button" class="btn btn-secondary" [routerLink]="['/groupelist']">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Make sure Font Awesome is included in your project -->
+<!-- If not already included in your index.html, add this to component TS file:
+ngOnInit() {
+  // Load Font Awesome dynamically if not already loaded
+  if (!document.querySelector('link[href*="font-awesome"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+    document.head.appendChild(link);
+  }
+}
+-->

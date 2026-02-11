@@ -1,0 +1,97 @@
+<app-navbar></app-navbar>
+
+<section class="hero">
+  <div class="hero-carousel">
+    <div class="carousel-slide"></div>
+    <div class="carousel-slide"></div>
+    <div class="carousel-slide"></div> 
+    <div class="carousel-slide"></div> 
+  </div>
+  
+  <div class="container hero-content">
+    <div class="hero-text">
+      <h1>Bienvenue sur TOEIC Grader</h1>
+      <p>Gérez vos tests et évaluations en toute simplicité.</p>
+      <a routerLink="/test" class="btn btn-primary">Créer un Test</a>
+    </div>
+  </div>
+</section>
+
+<section class="services animate-on-scroll" appAnimateOnScroll>
+  <h2 class="services-title">
+    <span class="fa-stack fa-2x services-icon-stack">
+      <i class="fas fa-hand-holding fa-stack-2x"></i>
+      <i class="fas fa-cog gear gear1 fa-stack-1x"></i>
+      <i class="fas fa-cog gear gear2 fa-stack-1x"></i>
+      <i class="fas fa-cog gear gear3 fa-stack-1x"></i>
+    </span>
+    Nos Services
+  </h2>
+  
+  <div class="cards">
+
+    <div class="card fancy-card card-test">
+      <i class="fas fa-edit card-icon icon-test"></i>
+      <h3>Créer un Test</h3>
+      <p>Créez et gérez vos tests TOEIC en quelques clics.</p>
+      <a routerLink="/test" class="btn btn-secondary">Créer un Test</a>
+    </div>
+
+    <div class="card fancy-card card-classes">
+      <i class="fas fa-user-graduate card-icon icon-classes"></i>
+      <h3>Gérer les Classes</h3>
+      <p>Organisez vos groupes d'étudiants.</p>
+      <a routerLink="/classes" class="btn btn-secondary">Voir les Classes</a>
+    </div>
+
+    <div class="card fancy-card card-eval">
+      <i class="fas fa-chart-bar card-icon icon-eval"></i>
+      <h3>Évaluations et Suivi</h3>
+      <p>Analysez la progression et les résultats des étudiants.</p>
+      <a routerLink="/evaluations" class="btn btn-secondary">Voir les Évaluations</a>
+    </div>
+
+    <div class="card fancy-card card-import">
+      <i class="fas fa-file-import card-icon icon-import"></i>
+      <h3>Importer les Copies</h3>
+      <p>Importez et corrigez automatiquement les réponses.</p>
+      <a routerLink="/reponseetudiant" class="btn btn-secondary">Importer</a>
+    </div>
+  
+    <div class="card fancy-card card-export">
+      <i class="fas fa-file-export card-icon icon-export"></i>
+      <h3>Consulter les Scores</h3>
+      <p>
+        Exporter en fichier XLS/CSV<br>
+        Visualiser les scores des étudiants
+      </p>
+      <a routerLink="/score" class="btn btn-secondary">Voir les Scores</a>
+    </div>
+
+  </div>
+</section>
+
+<section class="nature container animate-on-scroll" appAnimateOnScroll>
+  <div class="nature-bg-overlay"></div>
+  
+  <div class="nature-content">
+    <div class="nature-text">
+      <h2>Le principe ? Accompagner vos étudiants vers la réussite TOEIC</h2>
+      <p>
+        Pour chaque test géré via TOEIC Grader, nous vous offrons un suivi personnalisé
+        et une analyse détaillée des performances.
+      </p>
+      <a class="btn btn-primary">En savoir plus</a>
+    </div>
+
+    <div class="nature-image">
+      <img src="assets/images/img2.png" alt="Forêt verdoyante" />
+    </div>
+  </div>
+</section>
+
+<section class="cta container animate-on-scroll" appAnimateOnScroll>
+  <h2>Prêt à commencer ?</h2>
+  <p>Créez votre premier test TOEIC dès aujourd'hui et suivez la progression de vos étudiants.</p>
+  <a routerLink="/test" class="btn btn-primary">Créer un Test Maintenant</a>
+</section>

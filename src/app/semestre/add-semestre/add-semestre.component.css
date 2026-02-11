@@ -1,0 +1,296 @@
+/* ======= Modern Form Styles with Bold Colors ======= */
+:root {
+  --primary-color: #6C63FF;
+  --secondary-color: #FF6584;
+  --accent-color: #30D5C8;
+  --dark-color: #2A265F;
+  --light-color: #F5F5FF;
+  --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --icon-blue: #007bff; /* Couleur bleue pour les icônes */
+  --hover-blue: #1890cc; /* Couleur bleue pour le survol des boutons */
+}
+
+/* Style des icônes */
+.fas {
+  margin-right: 8px;
+}
+
+/* Style spécifique pour les icônes des labels */
+.icon-label {
+  color: #007bff;
+  font-size: 1.2rem;
+}
+
+
+
+
+/* Style spécifique pour les icônes dans les labels */
+label .fas {
+  color: var(--icon-blue);
+  font-size: 1.2rem;
+}
+
+.form-container {
+  max-width: 650px;
+  margin: 60px auto;
+  background: var(--light-color);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.form-container:before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  height: 10px;
+  width: 100%;
+  background: var(--gradient);
+  z-index: 1;
+}
+
+.form-container:hover {
+  box-shadow: 0 20px 40px rgba(108, 99, 255, 0.25);
+  transform: translateY(-5px);
+}
+
+.title {
+  font-size: 2.5rem;
+  color: var(--dark-color);
+  margin-bottom: 30px;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;    /* déjà présent */
+  justify-content: center; /* <-- ajoute ça */
+  width: 100%; 
+}
+
+.title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 4px;
+  background: var(--gradient);
+  border-radius: 2px;
+}
+
+.standard-form {
+  margin-top: 30px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--dark-color);
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+
+.form-control, .form-input {
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.05rem;
+  border: 2px solid #e0e0ff;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus, .form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 5px 15px rgba(108, 99, 255, 0.15);
+  outline: none;
+  transform: translateY(-2px);
+}
+
+select.form-control, select.form-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%236C63FF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+/* Error Messages */
+.error-message {
+  color: #fe3f61;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background-color: rgba(254, 63, 97, 0.1);
+  border-left: 4px solid #fe3f61;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  animation: errorShake 0.5s ease-in-out;
+}
+
+.error-message i {
+  margin-right: 8px;
+  font-size: 16px;
+  color: #fe3f61;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 15px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative; /* Nécessaire pour l'effet shine */
+  overflow: hidden;   /* Pour masquer l'animation en dehors du bouton */
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 1;
+}
+
+/* Pour le bouton primaire (Ajouter) */
+.btn-primary, .btn-update {
+  background: linear-gradient(140deg, #2980b9, #2980b9);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+}
+
+.btn-primary:hover, .btn-update:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.6);
+  color: #fff;
+}
+
+/* Pour le bouton secondaire (Retour) */
+.btn-secondary, .btn-return {
+  background: linear-gradient(45deg, #fff, #f0f0f0);
+  color: #007bff;
+  border: 2px solid #007bff;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-secondary:hover, .btn-return:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
+  color: #007bff;
+}
+
+/* Effet "shine" avec pseudo-élément pour les deux boutons */
+.btn-primary::before,
+.btn-update::before,
+.btn-secondary::before,
+.btn-return::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: skewX(-20deg);
+  transition: all 0.5s ease;
+}
+
+.btn-primary:hover::before,
+.btn-update:hover::before,
+.btn-secondary:hover::before,
+.btn-return:hover::before {
+  left: 200%;
+}
+
+/* Style pour le bouton désactivé */
+.btn-disabled {
+  background: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  border: none;
+}
+
+.btn-disabled:hover {
+  background: #cccccc;
+  color: #666666;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-disabled::before {
+  display: none;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-container {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-container {
+    max-width: 90%;
+    padding: 25px;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .form-control, .form-input {
+    padding: 12px 15px;
+  }
+}

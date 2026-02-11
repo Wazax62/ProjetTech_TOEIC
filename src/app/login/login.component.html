@@ -1,0 +1,80 @@
+<section class="container_login">
+  <div class="form_login">
+    <!-- Conteneur pour l'image circulaire et le logo -->
+    <div class="image_eilco_circle">
+      <img src="assets/images/eilco_calais.jpg" alt="image_campus" class="image_campus_circle" />
+      <img src="assets/images/eilco_logo.png" alt="eilco_logo" class="logo_eilco_center" />
+    </div>
+
+    <!-- Titre de la page Login -->
+    <div class="login_name">Login</div>
+
+    <!-- Message d'erreur global (s'affiche uniquement lors de la soumission) -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
+    </div>
+
+    <!-- Message de statut -->
+    <div *ngIf="statusMessage" 
+         class="alert alert-dismissible fade show" 
+         [ngClass]="{
+           'alert-success': messageType === 'success',
+           'alert-danger': messageType === 'error',
+           'alert-warning': messageType === 'warning',
+           'alert-info': messageType === 'info'
+         }" 
+         role="alert">
+      {{ statusMessage }}
+      <button type="button" class="btn-close" (click)="statusMessage = ''" aria-label="Close"></button>
+    </div>
+
+    <!-- Formulaire de connexion -->
+    <form (ngSubmit)="login()" class="form">
+      
+      <!-- Champ Email -->
+      <div>
+        <div class="form_group">
+          <i class="fas fa-envelope form_icon"></i>
+          <input [(ngModel)]="email" 
+                 name="email" 
+                 type="email" 
+                 placeholder="Email" 
+                 required 
+                 (input)="validateEmail()" />
+        </div>
+        <small *ngIf="errors.email" class="error_login">{{ errors.email }}</small>
+      </div>
+
+      <!-- Champ Mot de passe -->
+      <div>
+        <div class="form_group">
+          <input [(ngModel)]="password" 
+                 name="password" 
+                 [type]="passwordFieldType" 
+                 placeholder="Password" 
+                 id="password" 
+                 required 
+                 (input)="validatePassword()" />
+          <i class="bx" 
+             [ngClass]="passwordFieldType === 'password' ? 'bx-hide' : 'bx-show'" 
+             (click)="togglePasswordVisibility()"></i>
+        </div>
+        <small *ngIf="errors.password" class="error_login">{{ errors.password }}</small>
+      </div>
+
+      <!-- Bouton de soumission -->
+      <button type="submit" class="login_button">Login</button>
+      
+      <!-- Liens pour mot de passe oublié et création de compte -->
+      <div class="create_account">
+        <a routerLink="/forgot-password" class="Register-link">Forgot your password?</a>
+      </div>
+
+      <div class="create_account">
+        <a routerLink="/register" class="Register-link">Create an account</a>
+      </div>
+
+    </form>
+  </div>
+</section>

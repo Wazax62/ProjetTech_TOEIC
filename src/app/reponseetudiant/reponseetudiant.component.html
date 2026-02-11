@@ -1,0 +1,45 @@
+<div class="container import-container">
+    <h1 class="title">Importer le PDF des résultats</h1>
+    
+    <!-- Zone de glisser-déposer -->
+    <div class="drag-drop-area" 
+         [class.dragover]="dragOver"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave($event)"
+         (drop)="onFileDropped($event)">
+      <p *ngIf="!pdfFile">Glissez-déposez votre fichier PDF ici, ou cliquez pour sélectionner</p>
+      <p *ngIf="pdfFile">Fichier sélectionné : {{ pdfFile.name }}</p>
+      <!-- Input file caché pour permettre la sélection par clic -->
+      <input type="file" accept=".pdf" #fileInput (change)="onFileSelected($event)" />
+    </div>
+    
+    <!-- Section Résultats -->
+    <div class="results-section" *ngIf="results && results.length">
+      <h2>Résultats des étudiants</h2>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Oral (sur 495)</th>
+            <th>Écrit (sur 495)</th>
+            <th>Total</th>
+            <th>Note CC (sur 20)</th>
+            <th>Note ECUE TOEIC (sur 20)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of results">
+            <td>{{ r.nom }}</td>
+            <td>{{ r.prenom }}</td>
+            <td>{{ r.oralScore }}</td>
+            <td>{{ r.writtenScore }}</td>
+            <td>{{ r.totalScore }}</td>
+            <td>{{ r.ccNote }}</td>
+            <td>{{ r.ecueNote }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

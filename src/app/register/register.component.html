@@ -1,0 +1,136 @@
+<section class="body">
+  <section class="Container">
+    <div class="wrapper">
+      <!-- Formulaire d'inscription -->
+      <form (ngSubmit)="register()" class="form2" #registerForm="ngForm">
+
+        <!-- Logo de l'entreprise -->
+        <img src="assets/images/eilco_logo.png" alt="eilco_logo" class="logo_eilco" />
+        
+        <!-- Titre du formulaire -->
+        <h1>Register</h1>
+        
+        <!-- Message d'erreur global (s'affiche uniquement lors de la soumission) -->
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ errorMessage }}
+          <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
+        </div>
+
+        <!-- Message de statut : Succès, Erreur, Avertissement, ou Info -->
+        <div *ngIf="statusMessage" class="alert alert-dismissible fade show" [ngClass]="{
+          'alert-success': messageType === 'success',
+          'alert-danger': messageType === 'error',
+          'alert-warning': messageType === 'warning',
+          'alert-info': messageType === 'info'
+        }" role="alert">
+          {{ statusMessage }}
+          <button type="button" class="btn-close" (click)="statusMessage = ''" aria-label="Close"></button>
+        </div>
+        
+        <!-- Champ "First Name" (Prénom) -->
+        <div class="input-box">
+          <input 
+            [(ngModel)]="firstName" 
+            name="firstName" 
+            type="text" 
+            placeholder="First Name" 
+            required 
+            (blur)="formTouched = true; validateFirstName()"
+            (ngModelChange)="validateFirstName()"
+            #firstNameField="ngModel"
+          />
+          <!-- Icône représentant l'utilisateur -->
+          <i class='bx bxs-user'></i>
+        </div>
+        <!-- Message d'erreur pour "First Name" -->
+        <small *ngIf="errors.firstName && (firstNameField.dirty || firstNameField.touched || submitted)" class="error">{{ errors.firstName }}</small>
+        
+        <!-- Champ "Last Name" (Nom de famille) -->
+        <div class="input-box">
+          <input 
+            [(ngModel)]="lastName" 
+            name="lastName" 
+            type="text" 
+            placeholder="Last Name" 
+            required 
+            (blur)="formTouched = true; validateLastName()"
+            (ngModelChange)="validateLastName()"
+            #lastNameField="ngModel"
+          />
+          <!-- Icône représentant l'utilisateur -->
+          <i class='bx bxs-user'></i>
+        </div>
+        <!-- Message d'erreur pour "Last Name" -->
+        <small *ngIf="errors.lastName && (lastNameField.dirty || lastNameField.touched || submitted)" class="error">{{ errors.lastName }}</small>
+        
+        <!-- Champ "Email" -->
+        <div class="input-box">
+          <input 
+            [(ngModel)]="email" 
+            name="email" 
+            type="email" 
+            placeholder="Email" 
+            required 
+            (blur)="formTouched = true; validateEmail()"
+            (ngModelChange)="validateEmail()"
+            #emailField="ngModel"
+          />
+          <!-- Icône représentant l'email -->
+          <i class='bx bxs-envelope'></i>
+        </div>
+        <!-- Message d'erreur pour "Email" -->
+        <small *ngIf="errors.email && (emailField.dirty || emailField.touched || submitted)" class="error">{{ errors.email }}</small>
+        
+        <!-- Champ "Password" (Mot de passe) -->
+        <div class="input-box">
+          <input 
+            [(ngModel)]="password" 
+            name="password" 
+            [type]="passwordFieldType" 
+            placeholder="Password" 
+            required 
+            (blur)="formTouched = true; validatePassword()"
+            (ngModelChange)="validatePassword()"
+            #passwordField="ngModel"
+          />
+          <!-- Icône pour afficher/masquer le mot de passe -->
+          <i 
+            class='bx' 
+            [ngClass]="passwordFieldType === 'password' ? 'bx-hide' : 'bx-show'" 
+            (click)="togglePasswordVisibility(false)"></i>
+        </div>
+        <!-- Message d'erreur pour "Password" -->
+        <small *ngIf="errors.password && (passwordField.dirty || passwordField.touched || submitted)" class="error">{{ errors.password }}</small>
+        
+        <!-- Champ "Confirm Password" (Confirmer le mot de passe) -->
+        <div class="input-box">
+          <input 
+            [type]="passwordFieldTypeConfirmation" 
+            [(ngModel)]="confirmPassword" 
+            name="confirmPassword" 
+            placeholder="Confirm Password" 
+            required 
+            (blur)="formTouched = true; validateConfirmPassword()"
+            (ngModelChange)="validateConfirmPassword()"
+            #confirmPasswordField="ngModel"
+          />
+          <!-- Icône pour afficher/masquer la confirmation du mot de passe -->
+          <i 
+            class='bx' 
+            [ngClass]="passwordFieldTypeConfirmation === 'password' ? 'bx-hide' : 'bx-show'" 
+            (click)="togglePasswordVisibility(true)"></i>
+        </div>
+        <!-- Message d'erreur pour "Confirm Password" -->
+        <small *ngIf="errors.confirmPassword && (confirmPasswordField.dirty || confirmPasswordField.touched || submitted)" class="error">{{ errors.confirmPassword }}</small>
+        
+        <!-- Bouton de soumission du formulaire -->
+        <button type="submit" class="btn">Register</button>
+        
+        <!-- Lien pour aller à la page de connexion si l'utilisateur a déjà un compte -->
+        <div class="link-container">
+          <p class="login-link">Already have an account? <a routerLink="/login">Login</a></p>
+        </div>
+      </form>
+    </div>
+  </section>
+</section>

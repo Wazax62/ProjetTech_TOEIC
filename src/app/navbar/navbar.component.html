@@ -1,0 +1,33 @@
+<header class="navbar animate-on-scroll" appAnimateOnScroll>
+  <div class="container nav-container">
+    <a routerLink="/home" class="logo">TOEIC Grader</a>
+    
+    <!-- === BOUTON BURGER POUR MOBILE === -->
+    <button class="menu-toggle" (click)="toggleMenu()">
+      <i class="fas fa-bars"></i> <!-- Assurez-vous que Font Awesome est installé -->
+    </button>
+    
+    <!-- === MENU PRINCIPAL === -->
+    <nav class="nav-menu" [ngClass]="{'active': isMenuOpen}">
+      <a routerLink="/home" (click)="closeMenu()">Accueil</a>
+      <a routerLink="/studentlist" (click)="closeMenu()">Students</a>
+      <a routerLink="/groupelist" (click)="closeMenu()">Groupes</a>
+      <a routerLink="/evaluations" (click)="closeMenu()">Évaluations</a>
+      <a routerLink="/test" (click)="closeMenu()">Tests</a>
+      <a routerLink="/score" (click)="closeMenu()">Consulter Scores</a>
+      
+      <div class="dropdown">
+        <a class="dropdown-trigger">Other</a>
+        <div class="dropdown-content">
+          <a routerLink="/promotionlist" (click)="closeMenu()">Promotions</a>
+          <a routerLink="/semestre" (click)="closeMenu()">Semestres</a>
+          <a routerLink="/site" (click)="closeMenu()">Sites</a>
+        </div>
+      </div>
+      
+      <a routerLink="/login" class="btn nav-cta" (click)="closeMenu()">
+        <i class="fas fa-sign-in-alt"></i> LogOut
+      </a>
+    </nav>
+  </div>
+</header>

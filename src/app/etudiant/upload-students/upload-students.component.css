@@ -1,0 +1,142 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Corps de page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fc;
+  color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  
+
+}
+
+/* Conteneur principal */
+.container {
+  max-width: 50%;
+  margin: 100px auto;
+  width: 100%;
+  /* margin: 0 auto; */
+}
+
+/* Carte */
+.card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.card-body {
+  text-align: center;
+}
+
+/* Titre */
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  color: #2c3e50;
+}
+
+/* Formulaire */
+.form-group {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.form-control-file {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-file:focus {
+  border-color: #1890cc;
+  outline: none;
+}
+
+/* Bouton */
+.btn {
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-primary {
+  background-color: #1890cc;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0d5892;
+  transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Alertes */
+.alert {
+  margin-top: 20px;
+  padding: 12px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+
+/* Responsive */
+@media (max-width: 576px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+  }
+}

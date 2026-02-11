@@ -1,0 +1,27 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <h2>Téléverser Votre Fichier Excel</h2>
+      <form (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-group">
+          <label for="file">Sélectionnez un fichier Excel</label>
+          <input
+            type="file"
+            class="form-control-file"
+            id="file"
+            (change)="onFileChange($event)"
+            accept=".xlsx, .xls"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Téléverser</span>
+          <span *ngIf="isLoading">Téléversement en cours...</span>
+        </button>
+      </form>
+      
+     
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <div class="form-container">
+    <h1 class="title">Modifier un Groupe</h1>
+    
+    <form (ngSubmit)="updateGroup()" class="standard-form">
+      <!-- Nom du Groupe -->
+      <div class="form-group">
+        <label for="groupName">Nom du Groupe</label>
+        <input type="text" class="form-control" id="groupName" [(ngModel)]="group.nom" name="groupName" required>
+        <div class="error-message" *ngIf="errors['groupName']">{{ errors['groupName'] }}</div>
+      </div>
+
+      <!-- Site -->
+      <div class="form-group">
+        <label for="groupSiteId">Site</label>
+        <select class="form-control" id="groupSiteId" [(ngModel)]="group.site_id" name="groupSiteId" required (change)="onSiteChange(group.site_id)">
+          <option *ngFor="let site of sites" [value]="site.id" [selected]="site.id === group.site_id">{{ site.nom }}</option>
+        </select>
+        <div class="error-message" *ngIf="errors['groupSiteId']">{{ errors['groupSiteId'] }}</div>
+      </div>
+
+      <!-- Promotion -->
+      <div class="form-group">
+        <label for="groupPromotionId">Promotion</label>
+        <select class="form-control" id="groupPromotionId" [(ngModel)]="group.promotion_id" name="groupPromotionId" required (change)="onPromotionChange(group.promotion_id)">
+          <option *ngFor="let promo of filteredPromotions" [value]="promo.id" [selected]="promo.id === group.promotion_id">{{ promo.nom }}</option>
+        </select>
+        <div class="error-message" *ngIf="errors['groupPromotionId']">{{ errors['groupPromotionId'] }}</div>
+      </div>
+
+      <!-- Semestre -->
+      <div class="form-group">
+        <label for="groupSemestreId">Semestre</label>
+        <select class="form-control" id="groupSemestreId" [(ngModel)]="group.semestre_id" name="groupSemestreId" required>
+          <option *ngFor="let semestre of filteredSemestres" [value]="semestre.id" [selected]="semestre.id === group.semestre_id">{{ semestre.nom }}</option>
+        </select>
+        <div class="error-message" *ngIf="errors['groupSemestreId']">{{ errors['groupSemestreId'] }}</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Modifier</button>
+        <button type="button" class="btn btn-secondary" [routerLink]="['/groupelist']">Retour</button>
+      </div>
+    </form>
+  </div>
+</div>

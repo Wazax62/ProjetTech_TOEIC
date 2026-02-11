@@ -1,0 +1,84 @@
+<div class="container">
+    <h1>Gestion des Tests TOEIC</h1>
+    <form (ngSubmit)="onSubmit()">
+      <div>
+        <label>Titre :</label>
+        <input [(ngModel)]="test.Titre" name="titre" type="text" required placeholder="Entrez le titre du test" />
+      </div>
+      <div>
+        <label>Description :</label>
+        <textarea [(ngModel)]="test.Description" name="description"></textarea>
+      </div>
+      <div>
+        <label>Type :</label>
+        <select [(ngModel)]="test.Type" name="type" required>
+          <option value="Écrit">Écrit</option>
+          <option value="Oral">Oral</option>
+        </select>
+      </div>
+      <div>
+        <label>Date :</label>
+        <input [(ngModel)]="test.Date" name="date" type="date" required />
+      </div>
+      <div>
+        <label>Groupe :</label>
+        <select [(ngModel)]="test.groupe" name="groupe" required>
+          <option value="Cls 1 24-25 PODVIN">Cls 1 24-25 PODVIN</option>
+          <option value="Cls 2 24-25 PODVIN">Cls 2 24-25 PODVIN</option>
+        </select>
+      </div>
+      <button type="submit">Enregistrer</button>
+    </form>
+  
+    <h2>Liste des Tests</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tests">
+          <td>{{ t.ID_date_groupe }}</td>
+          <td>{{ t.Titre }}</td>
+          <td>{{ t.Type }}</td>
+          <td>{{ t.Date }}</td>
+          <td>
+            <button (click)="editTest(t)">Modifier</button>
+            <button (click)="deleteTest(t.ID_date_groupe!)">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <h2>Saisie des réponses</h2>
+    <form (ngSubmit)="saveResponses()">
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Réponse</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let question of questions">
+            <td>{{ question.numero }}</td>
+            <td>
+              <select [(ngModel)]="question.reponse" name="reponse{{ question.numero }}">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="submit">Enregistrer les réponses</button>
+    </form>
+  </div>
+  

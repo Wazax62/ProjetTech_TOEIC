@@ -1,0 +1,62 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <h1 class="title"><i class="fas fa-building title-icon"></i>Liste des Sites</h1>
+  
+  <!-- Barre de recherche améliorée -->
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un site..." />
+  </div>
+  
+  <!-- Boutons d'action -->
+  <div class="action-row">
+    <div class="same">
+      <button class="btn-add" routerLink="/addsite">
+        <i class="fas fa-plus"></i> Ajouter un Site
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteneur de cards -->
+  <div class="grid-card-container">
+    <!-- Boucle sur les sites filtrés -->
+    <div class="fancy-card" *ngFor="let site of filteredSites">
+      <div class="card-body">
+        <!-- Titre (nom du site) -->
+        <h3 class="card-title">{{ site.nom }}</h3>
+
+        <!-- Boutons d'action -->
+        <div class="card-actions">
+          <!-- <a [routerLink]="['/update-site', site.id]" class="btn-action btn-correct">
+            <i class="fas fa-edit"></i>
+            <span>Modifier</span>
+          </a> -->
+          <button class="btn-action btn-delete" (click)="deleteSite(site.id)">
+            <i class="fas fa-trash"></i>
+            <span>Supprimer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun site trouvé -->
+    <div *ngIf="filteredSites && filteredSites.length === 0" class="no-items">
+      <p>Aucun site trouvé.</p>
+    </div>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="pagination-controls">
+    <div class="pagination-buttons">
+      <button class="btn-pagination" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fas fa-chevron-left"></i> Précédent
+      </button>
+      <button class="btn-pagination" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Suivant <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="pagination-info">
+      Page {{ currentPage }} sur {{ totalPages }}
+    </div>
+  </div>
+</div>

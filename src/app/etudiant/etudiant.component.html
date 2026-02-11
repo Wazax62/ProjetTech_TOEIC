@@ -1,0 +1,76 @@
+<app-navbar></app-navbar>
+
+<div class="container my-5">
+  <h1 class="title">Liste des Étudiants</h1>
+  
+  <!-- Barre de recherche améliorée -->
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un étudiant..." />
+  </div>
+  
+  <!-- Boutons d'action -->
+  <div class="action-row">
+    <div class="search-filters">
+      <!-- Espace réservé pour les filtres futurs -->
+    </div>
+    <div class="action-buttons">
+      <button class="btn-add" routerLink="/addstudent">
+        <i class="fas fa-plus"></i> Ajouter un Étudiant
+      </button>
+
+      <button class="btn-add btn-add-list" routerLink="/uploadstudent">
+        <i class="fas fa-file-upload"></i> Import CSV List
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteneur de cards -->
+  <div class="grid-card-container">
+    <!-- Boucle sur les étudiants filtrés -->
+    <div class="fancy-card" *ngFor="let student of filteredStudents">
+      <div class="card-body">
+        <!-- Titre (nom + prénom) -->
+        <h3 class="card-title">{{ student.nom }} {{ student.prenom }}</h3>
+
+        <!-- Informations sur l'étudiant -->
+        <p class="card-group"><i class="fas fa-graduation-cap"></i> Promotion: {{ student.promotion }}</p>
+        <p class="card-group"><i class="fas fa-calendar-alt"></i> Semestre: {{ student.semestre }}</p>
+        <p class="card-group"><i class="fas fa-users"></i> Groupe: {{ student.groupe }}</p>
+        <p class="card-group"><i class="fas fa-map-marker-alt"></i> Site: {{ student.site }}</p>
+        <p class="card-group"><i class="fas fa-book"></i> Spécialité: {{ student.specialite }}</p>
+
+        <!-- Boutons d'action -->
+        <div class="card-actions">
+          <a [routerLink]="['/update-student', student.id]" class="btn-action btn-correct">
+            <i class="fas fa-edit"></i>
+            <span>Modifier</span>
+          </a>
+          <button class="btn-action btn-delete" (click)="deleteStudent(student.id)">
+            <i class="fas fa-trash"></i>
+            <span>Supprimer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucun étudiant trouvé -->
+    <div *ngIf="filteredStudents.length === 0" class="no-evaluations">
+      <p>Aucun étudiant trouvé.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-controls">
+    <div class="pagination-buttons">
+      <button class="btn-pagination" (click)="previousPage()" [disabled]="currentPage === 1">
+        <i class="fas fa-chevron-left"></i> Précédent
+      </button>
+      <button class="btn-pagination" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Suivant <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="pagination-info">
+      Page {{ currentPage }} sur {{ totalPages }}
+    </div>
+  </div>
+</div>

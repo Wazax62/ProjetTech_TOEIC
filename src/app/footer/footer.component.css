@@ -1,0 +1,46 @@
+.footer {
+  background: linear-gradient(140deg, #2980b9, #2980b9);/* Le footer peut garder son propre fond */
+    padding: 30px 0; /* Un peu plus de padding */
+    color: #f0f0f0; /* Texte clair pour contraster */
+    text-align: center; /* Centrer tout le texte par défaut */
+  }
+  .footer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centrer les éléments horizontalement */
+    flex-wrap: wrap; /* Permettre le retour à la ligne si nécessaire */
+    gap: 20px; /* Espacement entre le texte et les liens */
+    max-width: 1200px; /* Centrer le contenu comme le reste */
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .footer-container p { 
+      font-size: 0.9rem; 
+      color: #f0f0f0; /* Assurer la couleur du texte */
+      margin: 0; /* Supprimer marges par défaut du p */
+  }
+  
+  .footer-nav a {
+    margin: 0 10px; /* Espace horizontal entre les liens */
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #f0f0f0; /* Texte des liens clair */
+    transition: color 0.3s ease;
+  }
+  .footer-nav a:hover { 
+      color: #ffffff; /* Blanc au survol */
+  }
+  
+/* --- Styles Responsifs --- */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column; /* Empiler les éléments */
+    gap: 15px; /* Espacement entre les éléments empilés */
+    /* text-align: center;  Hérité de .footer */
+  }
+  /* Pas besoin de règles spécifiques pour .footer-nav ici */
+}
+
+/* Media query pour 576px n'est plus nécessaire avec flex-wrap et gap */
+/* @media (max-width: 576px) { ... } */
+  
