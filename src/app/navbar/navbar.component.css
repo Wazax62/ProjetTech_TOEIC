@@ -1,218 +1,275 @@
-@keyframes fadeInPage {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* ===========================
+   VARIABLES
+   =========================== */
+:root {
+  --eilco-blue: #004e92;      /* Bleu officiel */
+  --eilco-light: #00a8ff;     /* Bleu Cyan lumineux pour l'actif */
+  --eilco-dark: #003366;      /* Bleu sombre */
+  --hover-bg: #f4f8fb;        
+  --bg-white: #ffffff;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Conteneur global */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* ====== NAVBAR ====== */
+/* ===========================
+   NAVBAR (Structure)
+   =========================== */
 .navbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #eee;
-  position: relative;
-  z-index: 1000; /* Assure que le menu est au-dessus des autres éléments */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(255, 255, 255, 0.568);
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  font-family: 'Inter', 'Roboto', sans-serif;
 }
 
-.nav-container {
+.nav-wrapper {
+  position: relative; /* Référentiel pour les éléments absolus */
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center; /* Centre le contenu principal (le menu) */
+  align-items: center;
+}
+
+/* ===========================
+   1. GAUCHE (Logo) -> Position Absolue
+   =========================== */
+.brand-container {
+  position: absolute;
+  left: 30px; /* Collé à gauche */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 60px;
-}
-
-.logo {
+  gap: 12px;
   text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #1890cc; /* couleur principale */
 }
 
+.brand-logo {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--eilco-blue);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.brand-subtitle {
+  font-size: 0.7rem;
+  color: #666;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* ===========================
+   2. CENTRE (Menu) -> Flux normal (centré par le parent)
+   =========================== */
 .nav-menu {
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 
-.nav-menu a {
-  margin-left: 20px;
+/* Liens */
+.nav-menu > a, .dropdown-btn {
   text-decoration: none;
-  color: #0d5892; /* variante foncée */
-  font-weight: 500;
-  position: relative;
+  color: var(--eilco-dark);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 10px 18px;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.nav-menu a:hover {
-  color: #1890cc; /* couleur principale au survol */
+/* Hover */
+.nav-menu > a:not(.active):hover, 
+.dropdown:hover .dropdown-btn {
+  background-color: var(--hover-bg);
+  color: var(--eilco-blue);
+  transform: translateY(-2px);
 }
 
-/* Effet de soulignement progressif au survol */
-.nav-menu a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 2px;
-  background: #1890cc; /* couleur soulignement */
-  transition: width 0.3s;
+/* Page Active (Bleu clair + Souligné) */
+.nav-menu > a.active {
+  color: rgb(0, 119, 255) !important;
+  background-color: transparent;
+  font-size: larger;
+  transform: none;
+  border-bottom: 2px solid var(--eilco-light);
+  border-radius: 0; /* Carré en bas pour le soulignement */
 }
 
-.nav-menu a:hover::after {
-  width: 100%;
-}
-
-.nav-cta {
-  background-color: #1890cc; /* bouton appel à l'action */
-  color: #fff !important; /* Force la couleur blanche */
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-.nav-cta:hover {
-  background-color: #0d5892; /* variante foncée au survol */
-}
-
-/* ====== DROPDOWN MENU ====== */
+/* Dropdown */
 .dropdown {
   position: relative;
-  display: inline-block;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.dropdown-trigger {
-  cursor: pointer;
-  margin-left: 20px;
-  text-decoration: none;
-  color: #0d5892;
-  font-weight: 500;
-  position: relative;
+.dropdown-btn i {
+  margin-left: 6px;
+  font-size: 0.8em;
+  transition: transform 0.3s;
 }
 
-.dropdown-trigger::after {
-  content: "▼";
-  font-size: 0.7em;
-  margin-left: 5px;
-  vertical-align: middle;
-}
+.dropdown:hover .dropdown-btn i { transform: rotate(180deg); }
 
 .dropdown-content {
-  display: none;
   position: absolute;
   top: 100%;
-  left: 0;
-  min-width: 160px;
-  background-color: #ffffff;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  border-radius: 4px;
-  z-index: 1;
-  overflow: hidden;
-  margin-top: 2px;
-}
-
-.dropdown-content a {
-  color: #0d5892;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  margin: 0 !important; /* Annule la marge du .nav-menu a */
-  transition: background-color 0.3s;
-}
-
-.dropdown-content a::after {
-  display: none; /* Désactive l'effet de soulignement pour les liens du dropdown */
-}
-
-.dropdown-content a:hover {
-  background-color: #f9f9f9;
-  color: #1890cc;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: white;
+  min-width: 200px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  padding: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid #f0f0f0;
 }
 
 .dropdown:hover .dropdown-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdown-content a {
   display: block;
-  animation: fadeIn 0.3s;
+  padding: 12px 15px;
+  color: #444;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: background 0.2s;
+  text-align: left;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.dropdown-content a:hover {
+  background-color: #f0f7ff;
+  color: var(--eilco-blue);
 }
 
-/* ====== RESPONSIVE NAVBAR ====== */
-
-.menu-toggle {
-  display: none; /* Masqué par défaut sur grand écran */
-  background: none;
-  border: none;
-  color: #1890cc; /* Couleur du burger (bleu principal) */
-  font-size: 1.8rem;
-  cursor: pointer;
+/* ===========================
+   3. DROITE (Actions) -> Position Absolue
+   =========================== */
+.nav-actions {
+  position: absolute;
+  right: 30px; /* Collé à droite */
+  display: flex;
+  align-items: center;
 }
 
-@media (max-width: 768px) { /* Point de rupture pour mobile/tablette */
+.btn-logout {
+  background-color: rgba(255, 255, 255, 0.425);
+  color: rgb(255, 0, 0) !important;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 78, 146, 0.25);
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background-color: rgb(255, 255, 255);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 78, 146, 0.35);
+}
+
+/* ===========================
+   RESPONSIVE (Mobile)
+   =========================== */
+.menu-toggle { display: none; }
+
+@media (max-width: 1150px) {
+  /* Sur tablettes/mobile : on repasse en flex classique pour gérer le manque de place */
+  .nav-wrapper {
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+
+  .brand-container { position: static; } /* Le logo revient dans le flux */
+  .nav-actions { position: static; }     /* Le burger revient dans le flux */
+  
+  .btn-logout { display: none; } /* On cache le bouton logout PC */
+
+  .menu-toggle {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--eilco-blue);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Le menu devient un tiroir ou une liste */
   .nav-menu {
-    display: none; /* Masquer le menu principal */
-    /* Styles pour le menu mobile ouvert (sera activé par TS via la classe .active) */
     position: absolute;
-    top: 60px; /* Juste sous la navbar (hauteur de .nav-container) */
+    top: 70px;
     left: 0;
     width: 100%;
-    background-color: #ffffff; /* Fond blanc comme la navbar */
-    flex-direction: column; /* Afficher les liens verticalement */
-    align-items: stretch; /* Étirer les éléments sur la largeur */
-    padding: 0; /* Pas de padding haut/bas ici, géré par les liens */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-top: 1px solid #eee; /* Séparateur */
+    background: white;
+    flex-direction: column;
+    padding: 20px 0;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    align-items: stretch; /* Prend toute la largeur */
   }
 
   .nav-menu.active {
-    display: flex; /* Afficher le menu quand il est actif */
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
   }
 
-  .nav-menu li {
-    margin: 0; /* Annuler marge latérale */
-    width: 100%; /* Prendre toute la largeur */
-    text-align: center; /* Centrer le texte des liens */
-    border-bottom: 1px solid #eee; /* Séparateur entre liens */
+  .nav-menu > a, .dropdown-btn {
+    justify-content: center;
+    padding: 15px;
+    border-bottom: 1px solid #f9f9f9;
   }
   
-  .nav-menu li:last-child {
-      border-bottom: none; /* Pas de bordure pour le dernier */
-  }
-
-  .nav-menu a {
-     color: #0d5892; /* Assurer la couleur des liens dans le menu mobile */
-     padding: 15px 20px; /* Ajouter du padding aux liens */
-     display: block; /* Pour que le padding s'applique */
-     width: 100%; /* Assurer que le lien prend toute la largeur */
-     margin-left: 0; /* Annuler la marge spécifique */
-  }
-  
-  .nav-menu a::after {
-      display: none; /* Pas besoin de soulignement dans le menu mobile */
+  .dropdown-content {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    display: none;
+    width: 100%;
+    text-align: center;
+    background: #fafafa;
+    opacity: 1;
+    visibility: visible;
+    border: none;
   }
   
-  .nav-menu a:hover {
-      background-color: #f9f9f9; /* Fond léger au survol */
-      color: #1890cc;
-  }
-
-  .menu-toggle {
-    display: block; /* Afficher le bouton burger */
-  }
-
-  .nav-cta {
-      /* Optionnel: Décider quoi faire du bouton logout */
-      /* Par exemple, l'intégrer au menu mobile ou le laisser */
-      margin-left: auto; /* Le pousser à droite si les liens disparaissent */
-      margin-right: 10px; /* Un peu d'espace avant le burger */
-  }
-  
+  .dropdown:hover .dropdown-content { display: block; }
+  .dropdown-content a { text-align: center; }
 }

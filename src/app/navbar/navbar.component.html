@@ -1,23 +1,30 @@
-<header class="navbar animate-on-scroll" appAnimateOnScroll>
-  <div class="container nav-container">
-    <a routerLink="/home" class="logo">TOEIC Grader</a>
+<header class="navbar">
+  <div class="nav-wrapper">
     
-    <!-- === BOUTON BURGER POUR MOBILE === -->
-    <button class="menu-toggle" (click)="toggleMenu()">
-      <i class="fas fa-bars"></i> <!-- Assurez-vous que Font Awesome est installé -->
-    </button>
-    
-    <!-- === MENU PRINCIPAL === -->
+    <a routerLink="/home" class="brand-container">
+      <img src="assets/images/eilco_logo.png" alt="Logo EILCO" class="brand-logo">
+      <div class="brand-info">
+        <span class="brand-title">TOEIC GRADER</span>
+        <span class="brand-subtitle">EILCO Calais</span>
+      </div>
+    </a>
+
     <nav class="nav-menu" [ngClass]="{'active': isMenuOpen}">
-      <a routerLink="/home" (click)="closeMenu()">Accueil</a>
-      <a routerLink="/studentlist" (click)="closeMenu()">Students</a>
-      <a routerLink="/groupelist" (click)="closeMenu()">Groupes</a>
-      <a routerLink="/evaluations" (click)="closeMenu()">Évaluations</a>
-      <a routerLink="/test" (click)="closeMenu()">Tests</a>
-      <a routerLink="/score" (click)="closeMenu()">Consulter Scores</a>
       
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMenu()">
+        Accueil
+      </a>
+      
+      <a routerLink="/studentlist" routerLinkActive="active" (click)="closeMenu()">Étudiants</a>
+      <a routerLink="/groupelist" routerLinkActive="active" (click)="closeMenu()">Groupes</a>
+      <a routerLink="/evaluations" routerLinkActive="active" (click)="closeMenu()">Évaluations</a>
+      <a routerLink="/test" routerLinkActive="active" (click)="closeMenu()">Tests</a>
+      <a routerLink="/score" routerLinkActive="active" (click)="closeMenu()">Scores</a>
+
       <div class="dropdown">
-        <a class="dropdown-trigger">Other</a>
+        <button class="dropdown-btn">
+          Autres <i class="fas fa-chevron-down"></i>
+        </button>
         <div class="dropdown-content">
           <a routerLink="/promotionlist" (click)="closeMenu()">Promotions</a>
           <a routerLink="/semestre" (click)="closeMenu()">Semestres</a>
@@ -25,9 +32,16 @@
         </div>
       </div>
       
-      <a routerLink="/login" class="btn nav-cta" (click)="closeMenu()">
-        <i class="fas fa-sign-in-alt"></i> LogOut
-      </a>
     </nav>
+
+    <div class="nav-actions">
+      <a routerLink="/login" class="btn-logout" (click)="closeMenu()">
+        <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>
+      </a>
+      <button class="menu-toggle" (click)="toggleMenu()">
+        <i class="fas" [ngClass]="isMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+      </button>
+    </div>
+
   </div>
 </header>
