@@ -82,14 +82,41 @@ export class EvaluationsComponent implements OnInit {
     );
   }
 
-  // 3) Télécharger la feuille de réponse
-  viewResponseSheet(testId: number, groupeId: number) {
-    this.loadingButtonId = `btn-${testId}-${groupeId}`;
-    this.router.navigate(['/impression', testId, groupeId]);
-    setTimeout(() => {
-      this.loadingButtonId = null;
-    }, 500);
-  }
+  // 3) Télécharger la feuille de réponse (CORRIGÉ)
+  viewResponseSheet(testId: number, groupeId: number) {
+    this.loadingButtonId = `btn-${testId}-${groupeId}`; // Active le spinner sur le bouton
+
+    // Appel direct à l'API pour récupérer le fichier
+    fetch(`http://localhost:5000/api/generateresponsesheet/${testId}/${groupeId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erreur réseau lors du téléchargement');
+        }
+        return response.blob(); // On récupère le fichier en mode "Blob"
+      })
+      .then(blob => {
+        // Création d'une URL temporaire pour le fichier
+        const url = window.URL.createObjectURL(blob);
+        
+        // Création d'un lien <a> invisible
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Evaluation_${testId}_Groupe_${groupeId}.pdf`; // Nom du fichier téléchargé
+        document.body.appendChild(a); // On l'ajoute au DOM
+        a.click(); // On simule le clic
+        a.remove(); // On le supprime
+        
+        // Libération de la mémoire
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Erreur téléchargement:', error);
+        alert("Impossible de télécharger le fichier.");
+      })
+      .finally(() => {
+        this.loadingButtonId = null; // Désactive le spinner
+      });
+  }
 
   // 4) Ouvrir la modale de Correction
   openUploadModal(evaluation: any) {
