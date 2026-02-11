@@ -1,1223 +1,423 @@
-/* ======= Reset / Base ======= */
+/* =================================
+   1. GLOBAL & STRUCTURE (Fix Navbar)
+   ================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fc;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f7fa;
   color: #2c3e50;
 }
 
-/* Container principal de la page */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+/* LE CONTENEUR PRINCIPAL : C'est lui qui gère le scroll et l'espace sous la navbar */
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 110px; /* 70px (navbar) + 40px de marge pour ne rien cacher */
+  padding-bottom: 50px;
+  padding-left: 20px;
+  padding-right: 20px;
+  
+  /* Fond dégradé moderne */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-/* Titre principal */
+/* TITRE */
 .title {
   text-align: center;
-  margin: 30px 0;
-  color: #333;
-  font-weight: 600;
+  color: #004e92;
+  font-weight: 700;
+  margin-bottom: 40px;
+  font-size: 2rem;
 }
 
-/* Barre de recherche */
+/* =================================
+   2. BARRE DE RECHERCHE
+   ================================= */
 .search-bar {
   display: flex;
   position: relative;
   width: 100%;
   max-width: 800px;
-  margin: 0 auto 30px;
+  margin: 0 auto 40px auto;
 }
 
 .search-bar input {
   width: 100%;
-  padding: 15px 20px 15px 60px;
+  padding: 18px 25px 18px 55px; /* Espace pour l'icône à gauche */
   border-radius: 50px;
-  border: 1px solid #eee;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  font-size: 16px;
-  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 25px rgba(0, 4, 80, 0.08);
+  font-size: 1rem;
+  color: #333;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
 }
 
 .search-bar input:focus {
   outline: none;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  border-color: #4285f4;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15);
+  transform: translateY(-2px);
+  border-color: #007bff;
 }
 
 .search-icon {
   position: absolute;
-  left: 24px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
+  fill: #6c757d; /* Couleur SVG */
   width: 20px;
   height: 20px;
-  z-index: 1;
   pointer-events: none;
-  transition: all 0.3s;
+  z-index: 10;
+  transition: fill 0.3s;
 }
 
 .search-bar input:focus + .search-icon {
-  fill: #4285f4;
+  fill: #007bff;
 }
 
-/* Supprimer le pseudo-élément qui n'est plus nécessaire */
-.search-bar::before {
-  content: none;
-}
-
-/* ====================== TABLEAU/CARTES DES ÉVALUATIONS ====================== */
-
-/* Conteneur de cartes */
+/* =================================
+   3. GRILLE DES CARTES (Evaluations)
+   ================================= */
 .grid-card-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  /* Grille responsive automatique : min 320px de large */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 30px;
-  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Style des cartes */
+/* Design de la Carte */
 .fancy-card {
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  height: 100%;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  padding: 25px;
   display: flex;
   flex-direction: column;
-  border: none;
-  padding: 20px;
   position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  height: 100%;
 }
 
+/* Effet déco coin supérieur droit */
 .fancy-card::before {
   content: "";
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 150px;
-  height: 150px;
-  background: linear-gradient(135deg, rgba(220, 230, 255, 0.3), rgba(255, 220, 230, 0.3));
-  border-radius: 0 0 0 100%;
-  z-index: 0;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(0, 78, 146, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  transition: transform 0.4s ease;
 }
 
 .fancy-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
+.fancy-card:hover::before {
+  transform: scale(1.5);
+}
+
+/* Contenu Carte */
 .card-body {
-  padding: 0;
+  flex: 1; /* Pousse les actions vers le bas */
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  position: relative;
-  z-index: 1;
 }
 
 .card-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #333;
-  margin: 0 0 16px 0;
+  color: #004e92;
+  margin: 0 0 12px 0;
+  line-height: 1.3;
 }
 
 .card-group {
   font-size: 0.95rem;
-  color: #666;
-  margin: 0 0 8px 0;
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-description {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+  margin-bottom: 15px;
+  line-height: 1.4;
 }
 
 .card-date {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #888;
-  margin: 0 0 30px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto; /* Pousse la date juste au-dessus des boutons */
 }
 
-/* Styles des boutons */
+/* =================================
+   4. BOUTONS D'ACTION (Grid 2x2)
+   ================================= */
 .card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 boutons par ligne */
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .btn-action {
-  flex: 1;
-  padding: 12px 0;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  border-radius: 10px;
+  padding: 12px 10px;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-size: 0.95rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
+  gap: 8px;
   color: white;
-  /* Arrangement horizontal sur écrans larges */
-  max-width: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
 }
 
-/* Sur écrans plus grands que mobile, on affiche 2 boutons par ligne */
-@media (min-width: 577px) {
-  .card-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+.btn-action i {
+  font-size: 1rem;
 }
 
-/* Couleurs des boutons */
-.btn-download {
-  background: #3B82F6;
-}
-
-.btn-download:hover:not(:disabled) {
-  background: #2563EB;
-}
-
-.btn-correct {
-  background: #84CC16;
-}
-
-.btn-correct:hover:not(:disabled) {
-  background: #65A30D;
-}
-
-.btn-copy {
-  background: #F59E0B;
-}
-
-.btn-copy:hover:not(:disabled) {
-  background: #D97706;
-}
-
-.btn-delete {
-  background: #EF4444;
-}
-
-.btn-delete:hover:not(:disabled) {
-  background: #DC2626;
+.btn-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .btn-action:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background-color: #e0e0e0 !important;
+  color: #999;
 }
 
-/* Modal styles */
+/* Couleurs Spécifiques */
+.btn-download { background-color: #007bff; } /* Bleu */
+.btn-download:hover:not(:disabled) { background-color: #0056b3; }
+
+.btn-correct { background-color: #28a745; } /* Vert */
+.btn-correct:hover:not(:disabled) { background-color: #1e7e34; }
+
+.btn-copy { background-color: #ffc107; color: #333; } /* Jaune/Orange */
+.btn-copy:hover:not(:disabled) { background-color: #e0a800; }
+
+.btn-delete { background-color: #dc3545; } /* Rouge */
+.btn-delete:hover:not(:disabled) { background-color: #c82333; }
+
+
+/* =================================
+   5. MODALES (Style unifié)
+   ================================= */
 .modal-backdrop-blur {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(5px);
-  z-index: 1000;
+  z-index: 1040;
 }
 
-.custom-modal {
+/* On applique le style à .custom-modal ET .duplication-modal */
+.custom-modal, .duplication-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  z-index: 1001;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
+/* Header Modale */
 .modal-header {
+  background: #f8f9fa;
+  padding: 20px 25px;
+  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  background: linear-gradient(to right, #f7f9fc, #ffffff);
-  border-bottom: 1px solid #eee;
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 .modal-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #004e92;
   margin: 0;
 }
 
 .close {
   background: none;
   border: none;
-  font-size: 24px;
-  color: #777;
+  font-size: 1.5rem;
+  color: #999;
   cursor: pointer;
   transition: color 0.2s;
 }
+.close:hover { color: #333; }
 
-.close:hover {
-  color: #333;
-}
-
+/* Body Modale */
 .modal-body {
-  padding: 24px;
-  max-height: calc(90vh - 140px);
+  padding: 25px;
   overflow-y: auto;
+  flex: 1;
+  background-color: white; /* Important */
 }
 
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid #eee;
-  background: #fff;
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-}
-
-/* Form Styles */
+/* Formulaires */
 .form-group {
   margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
+  font-weight: 600;
   margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
+  color: #495057;
 }
 
-.form-control {
+.form-control, .form-control-file {
   width: 100%;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 1px solid #ddd;
+  padding: 12px;
+  border: 1px solid #dee2e6;
   border-radius: 8px;
-  background-color: #f9f9f9;
-  transition: all 0.2s;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #3B82F6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
   background-color: #fff;
 }
 
-.form-control::placeholder {
-  color: #aaa;
+.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
-select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23aaa'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 20px;
+/* Footer Modale */
+.modal-footer, .duplicate-modal-footer {
+  padding: 20px 25px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
 }
 
-select.form-control[multiple] {
-  background-image: none;
-  height: auto;
-  min-height: 120px;
+.btn-cancel {
+  background: #e9ecef;
+  color: #495057;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
+.btn-cancel:hover { background: #dee2e6; }
 
-.form-text {
-  display: block;
-  margin-top: 6px;
-  font-size: 0.85rem;
-  color: #777;
+.btn-submit {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
 }
+.btn-submit:hover { background: #0056b3; }
 
-/* Custom checkbox styling */
+/* Checkbox wrapper pour duplication */
 .form-check {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  cursor: pointer;
-  
-  
+  gap: 10px;
+  margin-top: 15px;
 }
 
-
-
 .form-check-input {
-  margin-right: 10px;
   width: 18px;
   height: 18px;
   cursor: pointer;
 }
 
 .form-check-label {
-  font-size: 16px;
-  cursor: pointer;
-  
-
-}
-
-/* Button Styles */
-.btn-cancel {
-  padding: 12px 20px;
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 15px;
-}
-
-.btn-cancel:hover {
-  background-color: #e5e7eb;
-}
-
-.btn-submit {
-  padding: 12px 28px;
-  background-color: #3B82F6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 15px;
-}
-
-.btn-submit:hover {
-  background-color: #2563EB;
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .custom-modal {
-    width: 95%;
-    max-width: none;
-  }
-  
-  .modal-header {
-    padding: 16px 20px;
-  }
-  
-  .modal-title {
-    font-size: 1.3rem;
-  }
-  
-  .modal-body {
-    padding: 20px;
-  }
-  
-  .form-control {
-    padding: 10px 14px;
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal-header {
-    padding: 14px 16px;
-  }
-  
-  .modal-title {
-    font-size: 1.2rem;
-  }
-  
-  .modal-body {
-    padding: 16px;
-  }
-  
-  .modal-footer {
-    padding: 14px 16px;
-    flex-direction: column;
-  }
-  
-  .btn-cancel, .btn-submit {
-    width: 100%;
-    padding: 12px;
-    text-align: center;
-  }
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .grid-card-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .card-actions {
-    flex-direction: column;
-  }
-  
-  .btn-action {
-    width: 100%;
-  }
-}
-
-/* ====================== BOUTONS ====================== */
-
-.btn {
-  font-size: 0.9rem;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  margin-right: 8px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  display: inline-block;
-}
-
-/* Bouton "Télécharger Feuille" */
-.btn-download {
-  background-color: #1890cc; 
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-}
-.btn-download:hover {
-  background-color: #0d5892;
-}
-.btn-download:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-/* Bouton Corriger */
-.btn-correct {
-  background-color: #1890cc;
-  color: white;
-  font-size: 1rem;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-.btn-correct:hover {
-  background-color: #0d5892;
-  transform: translateY(-2px);
-}
-.btn-correct:disabled {
-  background-color: #d6e4f1;
-  color: #a0b8d3;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Bouton Dupliquer */
-.btn-duplicate {
-  background-color: #1890cc;
-  color: #fff;
-}
-.btn-duplicate:hover {
-  background-color: #0d5892;
-  transform: translateY(-2px);
-}
-
-/* Retrait de la marge sur le dernier bouton */
-td > .btn:last-child {
-  margin-right: 0;
-}
-
-/* ====================== SPINNER (INCHANGÉ) ====================== */
-.spinner-border {
-  width: 1rem;
-  height: 1rem;
-  vertical-align: text-bottom;
-  border: 2px solid rgba(0,0,0,0.2);
-  border-top: 2px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ====================== MODALES (INCHANGÉ) ====================== */
-.modal-backdrop-blur {
-  position: fixed;
-  top: 0; 
-  left: 0;
-  width: 100%; 
-  height: 100%;
-  backdrop-filter: blur(6px);
-  background-color: rgba(0,0,0,0.3);
-  z-index: 1040;
-}
-.custom-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 60%;
-  max-width: 800px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  transform: translate(-50%, -50%);
-  border-radius: 8px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-  z-index: 1050;
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
-  background: #f8f8f8;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-.modal-header .modal-title {
   margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #333;
-}
-.modal-header .close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
   cursor: pointer;
-  line-height: 1;
-}
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 1.5rem;
-}
-.modal-footer {
-  border-top: 1px solid #ddd;
-  background: #f8f8f8;
-  padding: 1rem 1.5rem;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  display: flex;
-  justify-content: center;
-}
-.form-group {
-  margin-bottom: 1rem;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-.form-group input[type="text"], .form-group input[type="datetime-local"], .form-group textarea, .form-group select {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 0.95rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.form-group select[multiple] {
-  height: 5.5rem;
-}
-.form-check {
-  margin-top: 1.5rem;
-  display: flex;
-  align-items: center;
-}
-.form-check-input {
-  margin-right: 8px;
-}
-.btn-primary {
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  padding: 0.6rem 1.2rem;
-  color: #fff;
   font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.btn-primary:hover {
-  background-color: #0056b3;
 }
 
-/* ====================== AJUSTEMENTS RESPONSIVES ====================== */
-
-/* --- Tablettes et Mobiles --- */
-@media (max-width: 768px) {
-  .container {
-    padding: 20px;
-    margin: 20px auto;
-  }
-  
-  .title {
-    font-size: 1.5rem;
-    margin-bottom: 30px;
-  }
-  
-  /* --- Transformation du tableau en cards simples et élégantes --- */
-  
-  /* Conteneur de cards */
-  .grid-card-container {
-    border: none;
-    overflow-x: visible; /* Désactiver le défilement horizontal */
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  
-  /* Masquer l'en-tête du tableau */
-  .evaluation-table {
-    display: contents; /* Permet aux éléments enfants d'être placés directement dans la grille */
-    background: transparent;
-    border: none;
-  }
-  
-  .evaluation-table thead {
-    display: none;
-  }
-  
-  .evaluation-table tbody {
-    display: contents; /* Permet aux tr enfants d'être placés directement dans la grille */
-  }
-  
-  /* Chaque ligne devient une card minimaliste */
-  .evaluation-table tbody tr {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    padding: 25px 20px;
-    text-align: center;
-    min-height: 200px;
-  }
-  
-  /* Contenu de la card */
-  .evaluation-table tbody td {
-    display: none; /* Masquer toutes les cellules par défaut */
-    border: none;
-    white-space: normal;
-  }
-  
-  /* Afficher uniquement le titre et les boutons d'action */
-  .evaluation-table tbody td:first-child,
-  .evaluation-table tbody td.action-buttons-cell,
-  .evaluation-table tbody td:last-child {
-    display: block;
-    width: 100%;
-  }
-  
-  /* Icône en haut de la carte */
-  .evaluation-table tbody tr::before {
-    content: "🖊️";
-    font-size: 24px;
-    color: #e74c3c;
-    margin-bottom: 15px;
-  }
-  
-  /* Titre de l'évaluation */
-  .evaluation-table tbody td:first-child {
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 10px;
-  }
-  
-  /* Description simplifiée */
-  .evaluation-table tbody td:first-child::after {
-    content: "Évaluation TOEIC en quelques clics.";
-    display: block;
-    font-size: 14px;
-    color: #666;
-    font-weight: normal;
-    margin-top: 10px;
-    margin-bottom: 20px;
-  }
-  
-  /* Boutons */
-  .action-buttons {
-    display: flex;
-    justify-content: center;
-    margin-top: auto; /* Pousse les boutons vers le bas */
-  }
-  
-  /* Style bouton principal */
-  .btn-primary,
-  .btn-correct,
-  .btn-download,
-  .btn-duplicate {
-    background-color: #2196f3;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 25px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: none;
-    transition: all 0.3s ease;
-    margin: 5px;
-  }
-  
-  .btn-primary:hover,
-  .btn-correct:hover,
-  .btn-download:hover,
-  .btn-duplicate:hover {
-    background-color: #0d8aee;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
-  }
-  
-  /* Bouton secondaire (suppression) */
-  .btn-delete {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 25px;
-    font-size: 14px;
-    font-weight: 500;
-    margin: 5px;
-  }
-  
-  .btn-delete:hover {
-    background-color: #e53935;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
-  }
-}
-
-/* --- Petits Mobiles --- */
-@media (max-width: 576px) {
-  .container {
-    padding: 10px;
-    margin: 10px;
-  }
-  
-  .title {
-    font-size: 1.3rem;
-    margin: 20px 0;
-  }
-  
-  .grid-card-container {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 10px;
-  }
-  
-  .fancy-card {
-    padding: 15px;
-    border-radius: 15px;
-  }
-  
-  .card-body {
-    padding: 0;
-  }
-  
-  .card-title {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-  }
-  
-  .card-group {
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-  }
-  
-  .card-date {
-    font-size: 0.85rem;
-    margin-bottom: 20px;
-  }
-  
-  /* Réarrangement des boutons pour mobile */
-  .card-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .btn-row {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .btn-action {
-    width: 100%;
-    padding: 10px 0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-  }
-  
-  /* Agrandissement de la barre de recherche */
-  .search-bar {
-    max-width: 100%;
-    margin-bottom: 20px;
-  }
-  
-  .search-bar input {
-    padding: 12px 15px 12px 50px;
-    font-size: 14px;
-  }
-  
-  .search-icon {
-    left: 20px;
-    width: 18px;
-    height: 18px;
-  }
-}
-
-/* Pour les très petits écrans */
-@media (max-width: 360px) {
-  .fancy-card {
-    padding: 12px;
-  }
-  
-  .card-title {
-    font-size: 1.2rem;
-  }
-  
-  .btn-action {
-    padding: 8px 0;
-    font-size: 0.85rem;
-  }
-  
-  .btn-action i {
-    font-size: 14px;
-  }
-}
-
-/* Message quand aucune évaluation n'est trouvée */
+/* Message Vide */
 .no-evaluations {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 40px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 10px;
-  color: #666;
+  padding: 50px;
+  color: #888;
   font-size: 1.1rem;
 }
 
-/* Responsive design */
+/* =================================
+   6. RESPONSIVE
+   ================================= */
 @media (max-width: 768px) {
-  .grid-card-container {
-    grid-template-columns: 1fr;
+  .page-container {
+    padding-top: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
-  
-  .btn-action {
-    min-width: 100%;
-  }
-  
-  .search-bar {
-    max-width: 100%;
-  }
-}
 
-@media (max-width: 480px) {
   .title {
     font-size: 1.5rem;
+    margin-bottom: 20px;
   }
-  
-  .search-bar input {
-    padding: 15px 15px 15px 60px;
-    font-size: 14px;
+
+  .grid-card-container {
+    grid-template-columns: 1fr; /* 1 carte par ligne sur mobile */
   }
-  
-  .card-body {
+
+  .fancy-card {
     padding: 20px;
   }
-}
 
-/* Style de la description */
-.card-description {
-  font-size: 0.95rem;
-  color: #666;
-  margin: 0 0 15px 0;
-  line-height: 1.4;
-  font-style: italic;
-}
-
-/* Responsive pour la description */
-@media (max-width: 576px) {
-  .card-description {
-    font-size: 0.85rem;
-    margin-bottom: 10px;
+  .card-actions {
+    grid-template-columns: 1fr; /* Boutons les uns sous les autres si très petit écran */
   }
-}
 
-/* ====================== STYLES POUR LA DUPLICATION SIMPLIFIÉE ====================== */
-
-.duplication-modal {
-  max-width: 600px;
-  border-radius: 16px;
-  background-color: #eef5fb;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.duplication-modal .modal-header {
-  background: #eef5fb;
-  border-bottom: none;
-  padding: 20px 24px 0;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-
-.duplication-modal .modal-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  display: flex;
-  align-items: center;
-}
-
-.icon-container {
-  color: #1890cc;
-  margin-right: 10px;
-  font-size: 26px;
-}
-
-.duplication-modal .close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #666;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.duplication-modal .close:hover {
-  opacity: 1;
-}
-
-.duplication-modal .modal-body {
-  padding: 10px 24px 24px;
-  background-color: #eef5fb;
-}
-
-/* Style des formulaires */
-.duplication-modal .form-group {
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.duplication-modal label {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.field-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  margin-right: 8px;
-  font-size: 14px;
-  color: #333;
-}
-
-/* Style des champs de formulaire */
-.duplication-modal .form-control {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 15px;
-  border: none;
-  border-radius: 8px;
-  background-color: #fff;
-  color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s;
-}
-
-.duplication-modal .form-control:focus {
-  outline: none;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.duplication-modal .form-control::placeholder {
-  color: #aaa;
-  font-size: 14px;
-}
-
-/* Style spécifique pour les select */
-.duplication-modal select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  padding-right: 40px;
-  cursor: pointer;
-}
-
-.duplication-modal select.form-control option {
-  color: #333;
-  padding: 8px;
-}
-
-.duplication-modal select.form-control option:first-child {
-  color: #666;
-  font-style: italic;
-}
-
-/* Nouveau style pour les options par défaut */
-.duplication-modal select.form-control option[value="null"] {
-  color: #666;
-  font-style: italic;
-}
-
-/* Style pour datetime */
-.duplication-modal input[type="datetime-local"].form-control {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23888' d='M14 2h-1V0h-2v2H5V0H3v2H2C.9 2 0 0 0 4v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H2V6h12v8z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  padding-right: 40px;
-}
-
-/* Style pour multi-select */
-.duplication-modal select.form-control[multiple] {
-  height: auto;
-  min-height: 120px;
-  background-image: none;
-  padding: 8px;
-}
-
-.duplication-modal .form-text {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-}
-
-/* Style pour la checkbox */
-.duplication-modal .form-check {
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  position: relative;
-  padding-left: 0;
-}
-
-.duplication-modal .form-check-input {
-  margin-right: 10px;
-  width: 20px;
-  height: 20px;
-  position: static;
-}
-
-.duplication-modal .form-check-label {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  padding-left: 0;
-  margin-left: 0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .duplication-modal {
-    width: 95%;
-    max-width: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .duplicate-modal-footer {
+  .modal-footer, .duplicate-modal-footer {
     flex-direction: column;
-    gap: 10px;
   }
-  
-  .duplication-modal .btn-cancel,
-  .duplication-modal .btn-submit {
+
+  .btn-cancel, .btn-submit {
     width: 100%;
   }
-}
-
-select#test-site{
-  padding-left: 10px;
-  padding-bottom: 10px;
-  padding-block: 6px;
-}
-
-
-
-
-.test-site{
-  padding-block: 10px;
-  padding-left: 10px;
-}
-
-.duplicate-modal-footer {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.duplication-modal .btn-cancel,
-.duplication-modal .btn-submit {
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.duplication-modal .btn-cancel {
-  background-color: #e9edf0;
-  color: #555;
-  border: none;
-}
-
-.duplication-modal .btn-cancel:hover {
-  background-color: #dce0e3;
-}
-
-.duplication-modal .btn-submit {
-  background-color: #1890cc;
-  color: white;
-  border: none;
-}
-
-.duplication-modal .btn-submit:hover {
-  background-color: #0d5892;
-}
-
-/* Style pour les checkboxes */
-.checkbox-wrapper {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  padding-left: 12px;
-}
-
-.checkbox-wrapper input[type="checkbox"] {
-  margin-right: 10px;
-  width: 18px;
-  height: 18px;
-}
-
-.checkbox-label {
-  font-size: 15px;
-  color: #333;
 }
