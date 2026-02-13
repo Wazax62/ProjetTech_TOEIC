@@ -16,7 +16,7 @@ def draw_filled_triangle(canvas, x1, y1, x2, y2, x3, y3, fill_color=colors.black
 def generate_toeic_pdf(pdf_filename, etudiants, test):
     c = canvas.Canvas(pdf_filename, pagesize=A4)
     width, height = A4
-    x_start = 30
+    x_start = 80
     y_start = height - 30
     
     # Formater la date dans un format français
@@ -74,7 +74,7 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
         
         # Draw the table for the student
         table.wrapOn(c, width, height)
-        table.drawOn(c, x_start, y_start - 110)
+        table.drawOn(c, 35, y_start - 110)
 
         # Student number area
         num_x_start = width / 2 + 100
@@ -166,42 +166,42 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setStrokeColor(colors.black)
-                    c.rect(x_start - 25, question_y_start - (50 * 12.1) + 5, 270 + 10, (52 * 12) + 10)
+                    c.rect(x_start - 25, question_y_start - (50 * 12.1) + 5, 250, (52 * 12) + 10)
 
                     triangle_x1 = x_start - 25
                     triangle_y1 = question_y_start - (50 * 12) - 15
                     triangle_x2 = x_start - 5
                     triangle_y2 = question_y_start - (50 * 12) - 15
-                    triangle_x3 = x_start - 15
+                    triangle_x3 = x_start -15
                     triangle_y3 = question_y_start - (50 * 12) - 5
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setFont("Helvetica-Bold", 8)
                     c.drawString(x_start + 110, question_y_start - (50 * 12) - 10, "Listening")
                 elif section == 2:
-                    triangle_x1 = x_start + 240
+                    triangle_x1 = x_start + 205
                     triangle_y1 = question_y_start + 40
-                    triangle_x2 = x_start + 260
+                    triangle_x2 = x_start + 225
                     triangle_y2 = question_y_start + 40
-                    triangle_x3 = x_start + 250
+                    triangle_x3 = x_start + 215
                     triangle_y3 = question_y_start + 50
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setStrokeColor(colors.black)
-                    c.rect(x_start - 25, question_y_start - (50 * 12.1) + 5, 270 + 10, (52 * 12) + 10)
+                    c.rect(x_start - 15, question_y_start - (50 * 12.1) + 5, 240, (52 * 12) + 10)
 
-                    triangle_x1 = x_start + 240
+                    triangle_x1 = x_start + 205
                     triangle_y1 = question_y_start - (50 * 12) - 15
-                    triangle_x2 = x_start + 260
+                    triangle_x2 = x_start + 225
                     triangle_y2 = question_y_start - (50 * 12) - 15
-                    triangle_x3 = x_start + 250
+                    triangle_x3 = x_start + 215
                     triangle_y3 = question_y_start - (50 * 12) - 5
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setFont("Helvetica-Bold", 8)
                     c.drawString(x_start + 130, question_y_start - (50 * 12) - 10, "Reading")
 
-            x_start += 150
+            x_start += 120
 
         # Final triangle at the end
         triangle_x1 = x_start + 225
