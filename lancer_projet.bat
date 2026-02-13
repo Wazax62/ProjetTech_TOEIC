@@ -21,6 +21,6 @@ echo ------------------------------------------
 
 :: Attente de 12 secondes avant d'ouvrir le navigateur
 timeout /t 12 >nul
-start http://localhost:4200
+start http://localhost:4200/login
 
 exit
