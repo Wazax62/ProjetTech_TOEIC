@@ -607,209 +607,148 @@ def define_alternatives_region(questionMarks, marker_height, n_alternatives, img
 # -----------------------------------------------------
 
 def detect_sections_columns_and_contours(thresh_img, ansROI):
-    """
-    Détecte les sections principales, les colonnes et les contours intérieurs.
+    img_h, img_w = thresh_img.shape[:2]
     
-    Args:
-        thresh_img: Image seuillée
-        ansROI: Image pour l'affichage des résultats
-        
-    Returns:
-        Dictionnaire des cercles détectés par question
-    """
-    # Utiliser l'image seuillée comme carte des contours
-    edges = thresh_img
-    
-    # Trouver les contours externes
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Identifier les sections principales (grandes zones)
-    sections = []
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        if w > 300 and h > 300:  
-            sections.append((x, y, w, h))
-    
-    # Trier les sections de haut en bas
-    sections = sorted(sections, key=lambda s: s[1])
-    
-    # Convertir l'image pour le dessin
+    # Ratios basés sur ton générateur ReportLab
+    pt_to_px = img_w / 470.0
+    expected_diameter = img_w * 0.0212
+    expected_radius = int(expected_diameter / 2)
+    max_square_dim = int(img_w * 0.06) # Assez large pour le nombre "200"
+
     img_pil = Image.fromarray(cv2.cvtColor(ansROI, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(img_pil)
     
-    # Listes pour stocker les carrés mauves et les coordonnées des sections
+    raw_squares = []
+
+    # DÉCOUPAGE STRICT EN 4 COLONNES (Plus de fusion accidentelle !)
+    num_columns = 4
+    col_width = img_w // num_columns
+    
+    for i in range(num_columns):
+        col_x = i * col_width
+        col_thresh = thresh_img[:, col_x:col_x + col_width]
+        contours_col, _ = cv2.findContours(col_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        col_squares = []
+        for cnt in contours_col:
+            x_cont, y_cont, w_cont, h_cont = cv2.boundingRect(cnt)
+            # On cherche les objets qui ont la taille d'un numéro
+            if w_cont <= max_square_dim and h_cont <= max_square_dim and x_cont > 0 and y_cont > 0:  
+                col_squares.append((col_x + x_cont, y_cont, w_cont, h_cont, i))
+        
+        # FILTRE D'ALIGNEMENT : Les vrais numéros sont tous parfaitement alignés verticalement
+        if col_squares:
+            # On trouve la position X médiane de la colonne
+            median_x = np.median([sq[0] for sq in col_squares])
+            # On ne garde que les carrés qui sont alignés sur cet axe X (tolérance de 15px)
+            aligned_squares = [sq for sq in col_squares if abs(sq[0] - median_x) < 15]
+            raw_squares.extend(aligned_squares)
+
+    # Trier par Colonne, puis par position verticale (Y), puis horizontale (X)
+    raw_squares.sort(key=lambda x: (x[4], x[1], x[0]))
+    
     purple_squares = []
-    section_coords = []
-
-    # Traiter chaque section
-    for sect_idx, (x, y, w, h) in enumerate(sections):
-        
-        section = {"section": (x, y, w, h), "colonnes": []}
-
-        # Diviser chaque section en deux colonnes
-        col_width = w // 2
-        for i in range(2):
-            col_x = x + i * col_width
-            col_coords = (col_x, y, col_width, h)
-            section["colonnes"].append(col_coords)
-            
-            # Dessiner les bordures des colonnes
-            draw.rectangle([(col_x, y), (col_x + col_width, y + h)], outline=(0, 0, 255), width=1)
-            section_coords.append(section)
-            
-            # Analyser les contours dans chaque colonne
-            col_thresh = thresh_img[y:y+h, col_x:col_x + col_width]
-            contours_col, _ = cv2.findContours(col_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
-            # Identifier les petits carrés (marqueurs de questions)
-            if contours_col:
-                for cnt in contours_col:
-                    x_cont, y_cont, w_cont, h_cont = cv2.boundingRect(cnt)
-                    if w_cont <= 30 and h_cont <= 30 and x_cont > 0 and y_cont > 0:  
-                        
-                        # Calculer les coordonnées globales
-                        global_x = col_x + x_cont
-                        global_y = y + y_cont
-                        purple_squares.append((global_x, global_y, w_cont, h_cont, sect_idx, i))
-                        
-                        # Dessiner un rectangle autour du carré mauve
-                        padding1 = 5
-                        padding2 = 5
-                        draw.rectangle([(global_x - padding1, global_y - padding2),
-                                        (global_x + w_cont + padding1, global_y + h_cont + padding2)],
-                                       outline=(255, 0, 255), width=1)
     
-    # Trier les carrés mauves par section, colonne, puis position
-    purple_squares.sort(key=lambda x: (-x[4], x[5], x[1], x[0]))
-
-    # Liste pour stocker les cercles détectés
-    detected_circles = []
-    
-    # Parcourir chaque section
-    for section in section_coords:
-        section_x, section_y, section_w, section_h = section["section"]
-        
-        # Analyser chaque colonne
-        for col_idx, col_coords in enumerate(section["colonnes"]):
-            col_x, col_y, col_w, col_h = col_coords
-            col_img = thresh_img[col_y:col_y+col_h, col_x:col_x + col_w]
+    # FILTRE ANTI-DOUBLON : Supprime les cases coloriées prises pour des numéros
+    for sq in raw_squares:
+        if not purple_squares:
+            purple_squares.append(sq)
+        else:
+            prev_sq = purple_squares[-1]
+            # Si on est dans la même colonne et sur la même ligne
+            if sq[4] == prev_sq[4] and abs(sq[1] - prev_sq[1]) < 15:
+                continue 
+            purple_squares.append(sq)
             
-            # Détecter les cercles dans la colonne
-            circles = cv2.HoughCircles(
-                col_img,
-                cv2.HOUGH_GRADIENT, 
-                dp=1.5,
-                minDist=15,
-                param1=60,
-                param2=18,
-                minRadius=7,
-                maxRadius=10 
-            )
-        
-            # Traiter les cercles détectés
-            if circles is not None:
-                circles = np.uint16(np.around(circles))
-                
-                for circle in circles[0, :]:
-                    cx = int(circle[0]) + col_x
-                    cy = int(circle[1]) + col_y
-                    r = int(circle[2])
-                    detected_circles.append((cx, cy, r, sect_idx, col_idx))
-    
-    # Initialiser le numéro de question et le dictionnaire des cercles par question
     question_number = 1
     question_circles = {}
-   
-    # Associer les cercles aux carrés mauves (questions)
-    for square_idx, (x_sq, y_sq, w_sq, h_sq, _, _) in enumerate(purple_squares):
-        # Calculer le centre du carré
+    colors_list = [(0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)]
+
+    # CALCUL MATHÉMATIQUE EXACT DES RÉPONSES
+    for square_idx, (x_sq, y_sq, w_sq, h_sq, _) in enumerate(purple_squares):
         square_center_y = y_sq + h_sq // 2
-        square_center_x = x_sq + w_sq // 2 
-        radius = 5
-      
-        # Trouver les cercles alignés avec le carré mauve
-        row_circles = [c for c in detected_circles if abs(c[1] - square_center_y) < 5 and 30 <= (c[0] - square_center_x) <= 140]
-      
-        # Trier les cercles de gauche à droite
-        row_circles.sort(key=lambda c: c[0])
         
-        # Éliminer les doublons
-        unique_circles = []
-        for circle in row_circles:
-            existing_circle = next((ec for ec in unique_circles if circle[0] == ec[0] and circle[1] == ec[1]), None)
-            if existing_circle:
-                if circle[2] > existing_circle[2]: 
-                    unique_circles.remove(existing_circle)
-                    unique_circles.append(circle)
-            else:
-                unique_circles.append(circle)
-               
-        # Limiter à 4 cercles par question (A, B, C, D)
-        unique_circles = unique_circles[:4]
+        # Position de base de la question
+        x_pos_px = x_sq + (5 * pt_to_px)
         
-        # Retirer les cercles déjà utilisés
-        for uc in unique_circles:
-            if uc in detected_circles:
-                detected_circles.remove(uc)
-           
-        # Stocker les cercles pour cette question
-        question_circles[f"Question {question_number}"] = unique_circles
-
-        # Définir des couleurs pour distinguer les cercles
-        colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 0, 255)]
-
-        # Dessiner les cercles avec des couleurs différentes
-        if unique_circles:
-            for circle_idx, (cx, cy, r, _, _) in enumerate(unique_circles):
-                color = colors[circle_idx % len(colors)]  
-                left_up = (cx - r, cy - r)
-                right_down = (cx + r, cy + r)
-                draw.ellipse([left_up, right_down], outline=color, width=2)  
+        # Projection parfaite des 4 cases de réponse
+        cx_A = int(x_pos_px + (25 * pt_to_px))
+        cx_B = int(x_pos_px + (45 * pt_to_px))
+        cx_C = int(x_pos_px + (65 * pt_to_px))
+        cx_D = int(x_pos_px + (85 * pt_to_px))
+        
+        final_circles_for_question = [
+            (cx_A, square_center_y, expected_radius, 0, 0),
+            (cx_B, square_center_y, expected_radius, 0, 0),
+            (cx_C, square_center_y, expected_radius, 0, 0),
+            (cx_D, square_center_y, expected_radius, 0, 0)
+        ]
+        
+        question_circles[f"Question {question_number}"] = final_circles_for_question
+        
+        # Dessiner le résultat théorique pour le debug
+        for i, (cx, cy, r, _, _) in enumerate(final_circles_for_question):
+            color = colors_list[i % len(colors_list)]
+            draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], outline=color, width=2)
 
         question_number += 1
 
+    img_pil.save("debug_cercles_finaux.jpg")
     return question_circles
 
 def check_answers(question_circles, img):
-    """
-    Vérifie les réponses en détectant les cercles remplis pour chaque question.
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    Args:
-        question_circles: Dictionnaire des cercles par question
-        img: Image originale pour la vérification des réponses
-        
-    Returns:
-        Dictionnaire des réponses par numéro de question
-    """
     answers = ['A', 'B', 'C', 'D']
     page_answers = {}
     
-    for question_number, circles in enumerate(question_circles.values(), start=1):
-        selected_answers = []
-        
-        # Vérifier chaque cercle
-        for circle_idx, (cx, cy, r, _, _) in enumerate(circles):
-            # Extraire la région du cercle
-            roi = img[cy - r:cy + r, cx - r:cx + r]
-            
-            # Calculer la couleur moyenne dans cette région
-            mean_color = cv2.mean(roi)[:3]
-            
-            # Calculer l'intensité moyenne
-            intensity = sum(mean_color) / 3
-            
-            # Si l'intensité est faible, le cercle est probablement rempli (noirci)
-            if intensity < 100:
-                selected_answers.append(answers[circle_idx])
-        
-        # Déterminer le statut de la réponse
-        if len(selected_answers) > 1:
-            page_answers[question_number] = "Réponse fausse"
-        elif len(selected_answers) == 1:
-            page_answers[question_number] = selected_answers[0]
-        else:
-            page_answers[question_number] = "Vide"
+    # SEUIL DE REMPLISSAGE (À ajuster si besoin)
+    # 0.40 signifie que 40% de l'intérieur du cercle doit être strictement noir.
+    # Une croix fait généralement entre 0.10 et 0.25.
+    FILL_THRESHOLD = 0.60
     
+    for question_number, circles in enumerate(question_circles.values(), start=1):
+        fill_ratios = []
+        
+        for cx, cy, r, _, _ in circles:
+            # On prend 80% du rayon pour ignorer le bord imprimé du cercle
+            roi_r = max(1, int(r * 0.8))
+            y1, y2 = max(0, cy - roi_r), min(gray_img.shape[0], cy + roi_r)
+            x1, x2 = max(0, cx - roi_r), min(gray_img.shape[1], cx + roi_r)
+            roi = gray_img[y1:y2, x1:x2]
+            
+            if roi.size == 0:
+                fill_ratios.append(0)
+                continue
+                
+            # 1. Binariser l'image : tout ce qui est plus foncé que 150 devient BLANC (valeur 255), le reste NOIR (0)
+            # Cela permet d'isoler uniquement les vrais coups de crayon
+            _, thresh_roi = cv2.threshold(roi, 150, 255, cv2.THRESH_BINARY_INV)
+            
+            # 2. Compter le nombre de pixels coloriés
+            colored_pixels = cv2.countNonZero(thresh_roi)
+            total_pixels = roi.shape[0] * roi.shape[1]
+            
+            # 3. Calculer le ratio de remplissage (entre 0.0 et 1.0)
+            ratio = colored_pixels / total_pixels if total_pixels > 0 else 0
+            fill_ratios.append(ratio)
+            
+        # Trouver la case la plus remplie
+        max_ratio = max(fill_ratios)
+        
+        # Si la case la plus remplie dépasse notre seuil de 40%
+        if max_ratio >= FILL_THRESHOLD:
+            # On vérifie si l'étudiant n'a pas noirci deux cases (on prend celles qui sont proches du max)
+            selected = [answers[i] for i, ratio in enumerate(fill_ratios) if ratio >= FILL_THRESHOLD and ratio >= max_ratio - 0.15]
+            
+            if len(selected) > 1:
+                page_answers[question_number] = "Réponse multiple"
+            else:
+                page_answers[question_number] = selected[0]
+        else:
+            # Si aucune case ne dépasse 40% (même s'il y a une croix à 20%), c'est considéré vide
+            page_answers[question_number] = "Vide"
+            
     return page_answers
 
 
