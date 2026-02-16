@@ -521,7 +521,7 @@ def check_answers(question_circles, img):
     # SEUIL DE REMPLISSAGE (À ajuster si besoin)
     # 0.40 signifie que 40% de l'intérieur du cercle doit être strictement noir.
     # Une croix fait généralement entre 0.10 et 0.25.
-    FILL_THRESHOLD = 0.60
+    FILL_THRESHOLD = 0.50
     
     for question_number, circles in enumerate(question_circles.values(), start=1):
         fill_ratios = []
@@ -539,7 +539,7 @@ def check_answers(question_circles, img):
                 
             # 1. Binariser l'image : tout ce qui est plus foncé que 150 devient BLANC (valeur 255), le reste NOIR (0)
             # Cela permet d'isoler uniquement les vrais coups de crayon
-            _, thresh_roi = cv2.threshold(roi, 150, 255, cv2.THRESH_BINARY_INV)
+            _, thresh_roi = cv2.threshold(roi, 200, 255, cv2.THRESH_BINARY_INV)
             
             # 2. Compter le nombre de pixels coloriés
             colored_pixels = cv2.countNonZero(thresh_roi)
@@ -714,6 +714,10 @@ def process_pdf_for_students(pdf_path):
         # Appliquer un seuillage à l'image transformée
         thresh_val, thresh_img = auto_thresh(warped)
         #img_show(thresh_img, "Thresholded Warped Image", height=1000)
+
+        kernel_vertical = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 60))
+        lignes_verticales = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel_vertical)
+        thresh_img = cv2.subtract(thresh_img, lignes_verticales)
         
         # Améliorer l'image seuillée
         thresh_img_dilate = cv2.dilate(thresh_img, np.ones((3, 3), np.uint8), iterations=3)
@@ -759,6 +763,6 @@ def process_pdf_for_students(pdf_path):
 # -----------------------------------------------------
 
 # Exemple d'utilisation
-if __name__ == "__main__":
-   pdf_path = r"C:\Users\HugoL\Downloads\scan_ccadet_2026-02-16-14-57-33.pdf"
-   process_pdf_for_students(pdf_path)
+#if __name__ == "__main__":
+#   pdf_path = r"C:\Users\HugoL\Downloads\scan_ccadet_2026-02-16-14-57-33.pdf"
+#   process_pdf_for_students(pdf_path)
