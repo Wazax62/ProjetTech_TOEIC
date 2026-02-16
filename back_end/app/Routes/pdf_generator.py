@@ -55,7 +55,7 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
         ]
 
         col_widths = [110, 160]
-        row_heights = [20, 20, 20, 20, 44]
+        row_heights = [15, 15, 15, 15, 44]
         table = Table(table_data, colWidths=col_widths, rowHeights=row_heights)
 
         table.setStyle(TableStyle([
@@ -91,7 +91,7 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
 
         # Draw all circles as empty, then color only those matching the student number
         circle_x_start = num_x_start
-        circle_y_start = num_y_start - 20
+        circle_y_start = num_y_start - 10
 
         # First, draw all empty circles
         for row in range(10):
@@ -117,8 +117,8 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
 
         # Section for the questions
         question_number = 1
-        question_y_start = y_start - 190
-        question_y = y_start - 170
+        question_y_start = y_start - 180
+        question_y = y_start - 160
         circle_diameter = 10
         column_width = width / 2
         
@@ -158,15 +158,15 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
                 # Draw triangles and text based on sections
                 if section == 0:
                     triangle_x1 = x_start - 25
-                    triangle_y1 = question_y_start + 40
+                    triangle_y1 = question_y_start + 35
                     triangle_x2 = x_start - 5
-                    triangle_y2 = question_y_start + 40
+                    triangle_y2 = question_y_start + 35
                     triangle_x3 = x_start - 15
-                    triangle_y3 = question_y_start + 50
+                    triangle_y3 = question_y_start + 45
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setStrokeColor(colors.black)
-                    c.rect(x_start - 25, question_y_start - (50 * 12.1) + 5, 250, (52 * 12) + 10)
+                    c.rect(x_start - 25, question_y_start - (50 * 12.1) + 5, 250, (52 * 12) + 5)
 
                     triangle_x1 = x_start - 25
                     triangle_y1 = question_y_start - (50 * 12) - 15
@@ -180,15 +180,15 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
                     c.drawString(x_start + 110, question_y_start - (50 * 12) - 10, "Listening")
                 elif section == 2:
                     triangle_x1 = x_start + 205
-                    triangle_y1 = question_y_start + 40
+                    triangle_y1 = question_y_start + 35
                     triangle_x2 = x_start + 225
-                    triangle_y2 = question_y_start + 40
+                    triangle_y2 = question_y_start + 35
                     triangle_x3 = x_start + 215
-                    triangle_y3 = question_y_start + 50
+                    triangle_y3 = question_y_start + 45
                     draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
 
                     c.setStrokeColor(colors.black)
-                    c.rect(x_start - 15, question_y_start - (50 * 12.1) + 5, 240, (52 * 12) + 10)
+                    c.rect(x_start - 15, question_y_start - (50 * 12.1)+5, 250, (52 * 12) + 5 )
 
                     triangle_x1 = x_start + 205
                     triangle_y1 = question_y_start - (50 * 12) - 15
@@ -212,7 +212,7 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
         triangle_y3 = question_y_start
         draw_filled_triangle(c, triangle_x1, triangle_y1, triangle_x2, triangle_y2, triangle_x3, triangle_y3, colors.black)
         # Reset position after drawing questions
-        x_start = 30
+        x_start = 80
         y_start = height - 30
         # Move to the next page
         c.showPage()
