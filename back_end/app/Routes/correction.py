@@ -198,9 +198,9 @@ def img_show(img, window_name, width=None, height=None):
             cv2.resizeWindow(window_name, width, height)
 
     # Afficher l'image et attendre une touche
-    # cv2.imshow(window_name, img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow(window_name, img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def preprocess(image):
@@ -312,75 +312,66 @@ def contour_center(contour):
         return (0, 0)
 
 
+import cv2
+import numpy as np
+
 def find_markers(edged, image=None):
     """
-    Trouve les marqueurs triangulaires dans l'image.
-    
-    Args:
-        edged: Image des contours
-        image: Image originale pour l'affichage (optionnel)
-        
-    Returns:
-        Liste des marqueurs trouvés ou None en cas d'échec
+    Trouve les marqueurs triangulaires de manière robuste dans une image bruitée.
     """
-    # Trouver tous les contours
-    cnts, _ = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    
-    if not cnts:
-        return None
+    # 1. Petit nettoyage morphologique pour boucher les trous dans les contours
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
 
-    if image is None:
-        return None
+    # 2. Trouver les contours
+    cnts, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    # Dessiner tous les contours sur une copie de l'image
-    img = image.copy()
-    cv2.drawContours(img, cnts, -1, (255, 0, 0), 2)
-    # img_show(img, "Contours", height=950)
+    if not cnts or image is None:
+        return None
 
     markers = []
-    markers_area = []
-    
-    if len(cnts) > 0:
-        # Trier les contours par taille décroissante
-        cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+    markers_info = [] # Pour stocker (contour, aire, score_de_proximité)
 
-        # Examiner chaque contour
-        for c in cnts:
-            area = cv2.contourArea(c)
-            if area > 100:
-                # Approximer le contour
-                peri = cv2.arcLength(c, True)
-                approx = cv2.approxPolyDP(c, 0.02 * peri, True)
-
-                # Si le contour approximé a 3 points, c'est potentiellement un marqueur
-                if len(approx) == 3 and area > 100 and area < 5000:
-                    markers_area.append(area)
+    for c in cnts:
+        area = cv2.contourArea(c)
+        
+        # Filtre de taille (ajuste selon la résolution de ton PDF)
+        if 100 < area < 10000:
+            peri = cv2.arcLength(c, True)
+            # On augmente légèrement la tolérance (0.04 au lieu de 0.02)
+            approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+            
+            # 3. Critères de sélection robustes
+            # - Entre 3 et 5 points (souvent le bruit ajoute un point)
+            # - Doit être convexe
+            if 3 <= len(approx) <= 5 and cv2.isContourConvex(approx):
+                # On calcule la bounding box pour vérifier le ratio
+                x, y, w, h = cv2.boundingRect(approx)
+                aspect_ratio = float(w) / h
+                
+                # Un triangle de marqueur est généralement assez équilibré (pas une ligne)
+                if 0.5 < aspect_ratio < 2.0:
                     markers.append(approx)
+                    markers_info.append(area)
 
-        # Vérifier qu'on a trouvé au moins 4 marqueurs
-        if len(markers) < 4:
-            # print("Couldn't find all the four markers." + " Cannot continue. Aborting!")
-            return None
-
-        # Si plus de 4 triangles sont trouvés, ne garder que les 4 plus similaires en taille
-        while len(markers) > 4:
-            mean = np.mean(markers_area)
-            diff_mean = sorted([(abs(mean - v), i) for i, v in enumerate(markers_area)], reverse=True)
-            del markers_area[diff_mean[0][1]]
-            del markers[diff_mean[0][1]]
-
-    else:
-        # print("Error! No contour found! Impossible to continue. Aborting!")
+    # 4. Gestion du nombre de marqueurs
+    if len(markers) < 4:
+        print(f"Erreur : Seulement {len(markers)} marqueurs trouvés. Le PDF est peut-être trop bruité.")
         return None
 
-    # Afficher les marqueurs sélectionnés
-    if len(markers) > 0:
-        img = image.copy()
-        cv2.drawContours(img, markers, -1, (255, 0, 0), 2)
-        # img_show(img, "Markers", height=950)
-    else:
-        # print("Error! No marker found! Giving up.")
-        return None
+    # 5. Si on en a trop, on garde les 4 dont l'aire est la plus proche de la médiane
+    # C'est plus robuste que la moyenne car la médiane ignore les valeurs aberrantes
+    if len(markers) > 4:
+        median_area = np.median(markers_info)
+        # On trie par différence absolue avec la médiane
+        indexed_markers = sorted(enumerate(markers), 
+                                 key=lambda x: abs(cv2.contourArea(x[1]) - median_area))
+        markers = [indexed_markers[i][1] for i in range(4)]
+
+    # Affichage final
+    img_markers = image.copy()
+    cv2.drawContours(img_markers, markers, -1, (0, 255, 0), 3)
+    # img_show(img_markers, "Marqueurs détectés") # Décommente si ta fonction img_show est définie
 
     return markers
 
@@ -425,181 +416,6 @@ def warpcrop(image, gray, points):
 
     return ansROI, warped, upper_image, m_transform
 
-
-# -----------------------------------------------------
-# SECTION 5: FONCTIONS DE TRI DES CONTOURS
-# -----------------------------------------------------
-
-def sort_contours(contours, method="left-to-right"):
-    """
-    Trie les contours selon un critère spécifié.
-    
-    Args:
-        contours: Liste des contours à trier
-        method: Méthode de tri ("left-to-right", "right-to-left", "top-to-bottom", "bottom-to-top")
-        
-    Returns:
-        Liste des contours triés
-    """
-    reverse = False
-    i = 0
-
-    # Définir l'axe et l'ordre de tri
-    if method == "top-to-bottom":
-        i = 1
-    elif method == "right-to-left":
-        reverse = True
-    elif method == "bottom-to-top":
-        reverse = True
-        i = 1
-
-    # Obtenir les rectangles englobants
-    bounding_boxes = [cv2.boundingRect(c) for c in contours]
-    
-    # Trier les contours et les boîtes englobantes ensemble
-    (contours, bounding_boxes) = zip(*sorted(zip(contours, bounding_boxes),
-                                          key=lambda b: b[1][i], reverse=reverse))
-
-    return contours
-
-
-def sort_questionMarks(questionMarks, questions_format):
-    """
-    Trie les marques de questions selon le format spécifié.
-    
-    Args:
-        questionMarks: Liste des marques de questions
-        questions_format: Format des questions [lignes, colonnes]
-        
-    Returns:
-        Liste triée des marques de questions
-    """
-    rows = questions_format[0]
-
-    # Trier d'abord de gauche à droite
-    questionMarks = sort_contours(questionMarks, method="left-to-right")[0]
-    qm = []
-    
-    # Pour chaque colonne, trier de haut en bas
-    for i in np.arange(0, len(questionMarks), rows):
-        qm_col = sort_contours(questionMarks[i:i + rows], method="top-to-bottom")[0]
-        qm.extend(qm_col)
-
-    return qm
-
-
-# -----------------------------------------------------
-# SECTION 6: FONCTIONS DE DÉFINITION DES RÉGIONS
-# -----------------------------------------------------
-
-def boundingRect_contour(c=None, br=None):
-    """
-    Convertit un rectangle englobant en contour ou vice versa.
-    
-    Args:
-        c: Contour (optionnel)
-        br: Rectangle englobant (x, y, w, h) (optionnel)
-        
-    Returns:
-        Contour correspondant au rectangle englobant
-    """
-    if c is not None:
-        (x, y, w, h) = cv2.boundingRect(c)
-    elif br is not None:
-        (x, y, w, h) = br
-    else:
-        return None
-
-    # Créer un contour rectangulaire
-    brc = np.array([
-        [x, y],
-        [x, y + h],
-        [x + w, y + h],
-        [x + w, y]
-    ]).reshape(4, 1, 2)
-
-    return brc
-
-
-def define_each_alts_region(alts_regions, n_alternatives, alt_width):
-    """
-    Calcule les régions individuelles pour chaque alternative.
-    
-    Args:
-        alts_regions: Régions des alternatives
-        n_alternatives: Nombre d'alternatives par question
-        alt_width: Largeur de chaque alternative
-        
-    Returns:
-        Liste de toutes les régions d'alternatives
-    """
-    all_alternatives = []
-    
-    for alts in alts_regions:
-        startColumn = alts[0][0][0]
-        rowUp = alts[0][0][1]
-        rowDown = alts[1][0][1]
-
-        alternatives = []
-        for i in range(n_alternatives):
-            # Calculer la position de chaque alternative
-            leftColumn = startColumn + (i * alt_width)
-            alt = [[[int(leftColumn), int(rowUp)]],
-                   [[int(leftColumn), int(rowDown)]],
-                   [[int(leftColumn + alt_width), int(rowDown)]],
-                   [[int(leftColumn + alt_width), int(rowUp)]]]
-            alt = np.asarray(alt)
-            alternatives.append(alt)
-
-        all_alternatives.append(alternatives)
-    
-    return all_alternatives
-
-
-def define_alternatives_region(questionMarks, marker_height, n_alternatives, img=None):
-    """
-    Calcule les régions des alternatives basées sur les marques de questions.
-    
-    Args:
-        questionMarks: Marques de questions
-        marker_height: Hauteur des marqueurs
-        n_alternatives: Nombre d'alternatives par question
-        img: Image pour l'affichage (optionnel)
-        
-    Returns:
-        Liste des régions d'alternatives
-    """
-    # Calculer le décalage et la largeur des alternatives
-    offset = int(np.ceil(marker_height * 2.7))
-    alt_width = int(np.ceil(marker_height * 1.4))
-
-    alts_region = []
-    
-    for c in questionMarks:
-        alts = []
-        for i in range(len(c)):
-            alt = int(np.floor(i / 2)) * n_alternatives
-            alts.append(
-                [[c[i][0][0] + offset + (alt * alt_width),
-                  c[i][0][1]]])
-
-        alts = np.asarray(alts)
-        alts_region.append(alts)
-
-    # Dessiner les régions d'alternatives sur l'image
-    if img is not None:
-        for i, r in enumerate(alts_region):
-            drawContours(img, [r], (255, 0, 0), 5)
-            c = contour_center(r)
-            cv2.putText(img, str(i), c, cv2.FONT_HERSHEY_SIMPLEX,
-                        0.9, (0, 0, 255), 2)
-        # img_show(img, "Alternatives regions", height=950)
-
-    # Définir chaque région d'alternative
-    all_alternatives = define_each_alts_region(
-        alts_region, n_alternatives, alt_width)
-        
-    return all_alternatives
 
 
 # -----------------------------------------------------
@@ -756,133 +572,100 @@ def check_answers(question_circles, img):
 # SECTION 8: DÉTECTION DU NUMÉRO D'ÉTUDIANT
 # -----------------------------------------------------
 
+import cv2
+import numpy as np
+
+import cv2
+import numpy as np
+
 def detect_student_number(image):
     """
-    Détecte le numéro d'étudiant à partir des cercles remplis dans la partie supérieure.
-    
-    Args:
-        image: Image contenant la zone du numéro étudiant
-        
-    Returns:
-        Numéro d'étudiant détecté (sous forme de chaîne)
+    Détecte le numéro d'étudiant à partir des cercles remplis sous des carrés de repère.
+    Les cercles vont de -1 (tout en haut) à 9 (tout en bas).
     """
-    # Convertir en niveaux de gris
+    # 1. Convertir en niveaux de gris et binariser
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Appliquer un seuillage pour isoler les marques foncées
     _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    
 
-    # Détecter les contours
+    # 2. Détecter les contours
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    # print(f"Contours trouvés : {len(contours)}")
-
-    # Afficher les contours détectés
-    image_with_contours = image.copy()
-    cv2.drawContours(image_with_contours, contours, -1, (0, 255, 0), 3)
-
+    
     detected_squares = []
 
-    # Identifier les carrés parmi les contours
+    # 3. Identifier les carrés de repère
     for contour in contours:
         approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour, True), True)
         area = cv2.contourArea(contour)
-        
-        # Filtrer les contours qui ressemblent à des carrés
         if len(approx) == 4 and 100 < area < 5000: 
             detected_squares.append(approx)
 
-    # print(f"Carreaux détectés : {len(detected_squares)}")
+    # 4. Trier les carrés de GAUCHE à DROITE
+    detected_squares = sorted(detected_squares, key=lambda square: cv2.boundingRect(square)[0])
 
-    # Trier les carrés de droite à gauche
-    detected_squares = sorted(detected_squares, key=lambda square: -cv2.boundingRect(square)[0])
-
-    # Afficher les carrés détectés
     image_with_squares = image.copy()
-    cv2.drawContours(image_with_squares, detected_squares, -1, (0, 0, 255), 2)
-    # cv2.imshow("Detected Squares", image_with_squares)
-    # cv2.waitKey(0)
-
     student_number = ""
 
-    # Analyser chaque carré pour trouver les chiffres
+    # 5. Analyser chaque colonne
     for square in detected_squares:
-        # Trier les points du carré par coordonnée X
-        square_sorted_by_x = sorted(square, key=lambda point: point[0][0])
-        x_min = square_sorted_by_x[0][0][0] 
-        x_max = square_sorted_by_x[2][0][0]  
+        x_min, y_min, w, h = cv2.boundingRect(square)
+        x_max = x_min + w
         
-        # print(f"x_min: {x_min}, x_max: {x_max}")
-        
-        # Extraire la zone verticale correspondant au carré
-        zone_potentielle = gray[:, x_min:x_max]  
-        
-        # Dessiner un rectangle vertical pour visualiser la zone
-        cv2.rectangle(image_with_squares, (x_min, 0), (x_max, image.shape[0]), (255, 0, 255), 1)
+        zone_potentielle = gray[:, x_min:x_max] 
+        thresh_zone = thresh[:, x_min:x_max] 
 
-        # Appliquer un seuillage pour isoler les marques
-        _, thresh_zone = cv2.threshold(zone_potentielle, 150, 255, cv2.THRESH_BINARY_INV)
-
-        # Détecter les cercles dans cette zone
+        # Détecter les cercles
         circles = cv2.HoughCircles(
-            thresh_zone,
+            zone_potentielle,
             cv2.HOUGH_GRADIENT, 
-            dp=1.5,
-            minDist=15,
-            param1=60,
-            param2=18,
-            minRadius=7,
-            maxRadius=12
+            dp=1.5, minDist=15, param1=60, param2=18, minRadius=7, maxRadius=12
         )
 
         if circles is not None:
-            # Convertir les coordonnées des cercles en entiers
             circles = np.round(circles[0, :]).astype("int")
+            # Trier les cercles de haut en bas (index 0 correspondra à -1)
+            circles_sorted_by_y = sorted(circles, key=lambda c: c[1])
             
-            # Trier les cercles selon la coordonnée Y
-            circles_sorted_by_y = sorted(circles, key=lambda circle: circle[1])
+            best_circle_index = None # Initialisé à None pour éviter la confusion avec la valeur -1
+            max_filled_pixels = 0
             
-            # Liste pour stocker les cercles avec leur index
-            circles_with_index = []
-            
-            for idx, circle in enumerate(circles_sorted_by_y):
-                x, y, r = circle
+            # Analyser chaque cercle dans la colonne
+            for idx, (x, y, r) in enumerate(circles_sorted_by_y):
+                mask = np.zeros(thresh_zone.shape, dtype="uint8")
+                cv2.circle(mask, (x, y), r, 255, -1)
                 
-                # Compter les pixels noirs à l'intérieur du cercle
-                black_pixels = 0
-                for px in range(x - r, x + r + 1):  
-                    for py in range(y - r, y + r + 1):  
-                        if (px - x) ** 2 + (py - y) ** 2 <= r ** 2:  # Si le point est à l'intérieur du cercle
-                            
-                            if 0 <= px < thresh.shape[1] and 0 <= py < thresh.shape[0]:  # Vérifier les limites
-                                if np.array_equal(thresh[py, px], 0):  # Si le pixel est noir
-                                    black_pixels += 1
+                masked_circle = cv2.bitwise_and(thresh_zone, thresh_zone, mask=mask)
+                filled_pixels = cv2.countNonZero(masked_circle)
                 
-                # Si suffisamment de pixels noirs, considérer le cercle comme rempli
-                if black_pixels > 300:
-                    cv2.circle(image_with_squares, (x + x_min, y), r, (0, 255, 0), 4)
-                    cv2.putText(image_with_squares, f"Index: {idx}", (x + x_min, y - r - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                    circles_with_index.append((idx, circle))
-                    
-                    # Ajouter le chiffre au numéro d'étudiant
-                    student_number += str(idx)
-                    # print(f"Circle {idx}: Black pixels inside the circle: {black_pixels}")
+                if filled_pixels > max_filled_pixels:
+                    max_filled_pixels = filled_pixels
+                    best_circle_index = idx
+
+                # Optionnel : Dessin de tous les cercles détectés pour le debug
+                cv2.circle(image_with_squares, (x + x_min, y), r, (255, 0, 0), 2)
             
-            # Afficher les cercles avec leurs indices
-            # cv2.imshow("Circles with Indexes", image_with_squares)
-            # cv2.waitKey(0)
+            # Si un cercle suffisamment rempli a été trouvé
+            if max_filled_pixels > 50 and best_circle_index is not None:
+                # --- LA MODIFICATION EST ICI ---
+                # L'index 0 devient -1, l'index 1 devient 0, etc.
+                valeur_detectee = best_circle_index - 1
+                
+                student_number += str(valeur_detectee)
+                
+                # Dessiner le cercle choisi en vert et écrire la valeur au-dessus du carré
+                chosen_circle = circles_sorted_by_y[best_circle_index]
+                cv2.circle(image_with_squares, (chosen_circle[0] + x_min, chosen_circle[1]), chosen_circle[2], (0, 255, 0), 4)
+                cv2.putText(image_with_squares, str(valeur_detectee), (x_min, y_min - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    std_clean = ""
+    for i in range (len(student_number)) : 
+        if student_number[i] != "0" : 
+            std_clean = student_number[i:]
+            break
+    student_number = std_clean 
 
-        # Afficher les cercles triés avec leurs indices
-        # print("Circles sorted by Y axis with their index:")
-        # for idx, circle in circles_with_index:
-            # print(f"Index: {idx}, Circle: {circle}")
-        
-        # Inverser le numéro et supprimer les zéros en tête
-        student_number_reversed = student_number[::-1].lstrip("0")
-        # print(f"Student number (reversed, no leading zeros): {student_number_reversed}")
+    #cv2.imshow("Detection", image_with_squares)
+    #cv2.waitKey(0)
 
-    return student_number_reversed
-
+    return student_number
         
 
 
@@ -907,7 +690,7 @@ def process_pdf_for_students(pdf_path):
     student_results = {}
 
     # Traiter chaque page du PDF (chaque étudiant)
-    for page_number in range(pdf_document.page_count):
+    for page_number in range(pdf_document.page_count): 
         # Convertir la page en image
         page_img = pdf_to_image(pdf_path, page_num=page_number)
 
@@ -930,6 +713,7 @@ def process_pdf_for_students(pdf_path):
         
         # Appliquer un seuillage à l'image transformée
         thresh_val, thresh_img = auto_thresh(warped)
+        #img_show(thresh_img, "Thresholded Warped Image", height=1000)
         
         # Améliorer l'image seuillée
         thresh_img_dilate = cv2.dilate(thresh_img, np.ones((3, 3), np.uint8), iterations=3)
@@ -956,7 +740,12 @@ def process_pdf_for_students(pdf_path):
         
         # Ajouter les résultats au dictionnaire avec le numéro d'étudiant comme clé
         student_results[student_number] = student_answers
-
+        """img_show(warped, "Warped Image with Detected Circles", height=1000)
+        img_show(ansROI, "Answer ROI", height=1000)
+        img_show(upper_image, "Upper Image", height=1000)
+        img_show(thresh_img_erode, "Thresholded Image", height=1000)
+        img_show(thresh_img_dilate, "Detected Squares and Circles", height=1000)
+    """
     print(student_results)
     return student_results
 
@@ -970,6 +759,6 @@ def process_pdf_for_students(pdf_path):
 # -----------------------------------------------------
 
 # Exemple d'utilisation
-# if __name__ == "__main__":
-#     pdf_path = "C:/Users/admin/Downloads/test2.pdf"
-#     process_pdf_for_students(pdf_path)
+if __name__ == "__main__":
+   pdf_path = r"C:\Users\HugoL\Downloads\scan_ccadet_2026-02-16-14-57-33.pdf"
+   process_pdf_for_students(pdf_path)
