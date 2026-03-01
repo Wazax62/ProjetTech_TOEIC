@@ -1,10 +1,10 @@
 <app-navbar></app-navbar>
-<div class="container my-5">
+
+<div class="page-container">
   <div class="form-container">
     <h1 class="title"><i class="fas fa-clipboard-check title-icon"></i> Création d'un Test TOEIC</h1>
     
     <form class="standard-form">
-      <!-- Titre -->
       <div class="form-group">
         <label for="Titre">
           <i class="fas fa-heading icon-label"></i> Nom du Test
@@ -12,7 +12,6 @@
         <input type="text" id="Titre" [(ngModel)]="test.Titre" name="Titre" class="form-input" required placeholder="Entrez le nom du test">
       </div>
 
-      <!-- Description -->
       <div class="form-group">
         <label for="Description">
           <i class="fas fa-align-left icon-label"></i> Description
@@ -20,7 +19,6 @@
         <textarea id="Description" [(ngModel)]="test.Description" name="Description" class="form-input" placeholder="Entrez la description"></textarea>
       </div>
 
-      <!-- Site -->
       <div class="form-group">
         <label for="Site">
           <i class="fas fa-map-marker-alt icon-label"></i> Site
@@ -31,7 +29,6 @@
         </select>
       </div>
 
-      <!-- Date -->
       <div class="form-group">
         <label for="Date">
           <i class="fas fa-calendar-alt icon-label"></i> Date
@@ -44,7 +41,7 @@
           <i class="fas fa-users"></i> Sélectionner Groupe
         </button>
         
-        <button type="button" class="btn btn-secondary" (click)="onConfigureReponses()">
+        <button type="button" class="btn btn-config-vert" (click)="onConfigureReponses()">
           <i class="fas fa-check-circle"></i> Configurer les réponses
         </button>
       </div>
