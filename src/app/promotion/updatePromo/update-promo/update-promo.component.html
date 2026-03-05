@@ -1,32 +1,44 @@
 <app-navbar></app-navbar>
-<div class="container my-5">
+<div class="page-container">
   <div class="form-card">
-    <h1 class="title">Mettre à jour une Promotion</h1>
+    <h1 class="title">
+      <i class="fas fa-edit title-icon"></i> Mettre à jour la Promotion
+    </h1>
     
     <form (ngSubmit)="updatePromo()">
-      <!-- Niveau de la Promotion -->
       <div class="form-group">
-        <label for="promoLevel">Niveau de la Promotion</label>
+        <label for="promoLevel">
+          <i class="fas fa-graduation-cap icon-label"></i> Niveau de la Promotion
+        </label>
         <select class="form-input" id="promoLevel" [(ngModel)]="promoLevel" name="promoLevel" required>
           <option value="" disabled selected>Choisissez un niveau</option>
           <option *ngFor="let level of levels" [value]="level">{{ level }}</option>
         </select>
-        <div class="error-message" *ngIf="errors['promoLevel']">{{ errors['promoLevel'] }}</div>
+        <div class="error-message" *ngIf="errors['promoLevel']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['promoLevel'] }}
+        </div>
       </div>
       
-      <!-- Site -->
       <div class="form-group">
-        <label for="promoSiteId">Site</label>
+        <label for="promoSiteId">
+          <i class="fas fa-map-marker-alt icon-label"></i> Site
+        </label>
         <select class="form-input" id="promoSiteId" [(ngModel)]="promoSiteId" name="promoSiteId" required>
           <option value="" disabled selected>Choisissez un site</option>
           <option *ngFor="let site of sites" [value]="site.id">{{ site.nom }}</option>
         </select>
-        <div class="error-message" *ngIf="errors['promoSiteId']">{{ errors['promoSiteId'] }}</div>
+        <div class="error-message" *ngIf="errors['promoSiteId']">
+          <i class="fas fa-exclamation-circle"></i> {{ errors['promoSiteId'] }}
+        </div>
       </div>
       
       <div class="form-actions">
-        <button type="submit" class="btn btn-update">Mettre à jour</button>
-        <button type="button" class="btn btn-return" [routerLink]="['/promotionlist']">Retour</button>
+        <button type="button" class="btn btn-return" [routerLink]="['/promotionlist']">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+        <button type="submit" class="btn btn-update">
+          <i class="fas fa-save"></i> Mettre à jour
+        </button>
       </div>
     </form>
   </div>

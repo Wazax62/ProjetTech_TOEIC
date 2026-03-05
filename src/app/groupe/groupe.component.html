@@ -1,14 +1,12 @@
 <app-navbar></app-navbar>
 
-<div class="container my-5">
+<div class="page-container">
   <h1 class="title">Liste des Groupes</h1>
   
-  <!-- Barre de recherche améliorée -->
   <div class="search-bar">
     <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un groupe..." />
   </div>
   
-  <!-- Boutons d'action -->
   <div class="action-row">
     <div class="same">
       <button class="btn-add" routerLink="/addgroup">
@@ -17,20 +15,15 @@
     </div>
   </div>
 
-  <!-- Conteneur de cards -->
   <div class="grid-card-container">
-    <!-- Boucle sur les groupes filtrés -->
     <div class="fancy-card" *ngFor="let groupe of filteredGroupes">
       <div class="card-body">
-        <!-- Titre (nom du groupe) -->
         <h3 class="card-title">{{ groupe.nom }}</h3>
 
-        <!-- Informations sur le groupe -->
         <p class="card-group"><i class="fas fa-graduation-cap"></i> Promotion: {{ groupe.promotion }}</p>
         <p class="card-group"><i class="fas fa-calendar-alt"></i> Semestre: {{ groupe.semestre }}</p>
         <p class="card-group"><i class="fas fa-map-marker-alt"></i> Site: {{ groupe.site }}</p>
 
-        <!-- Boutons d'action -->
         <div class="card-actions">
           <a [routerLink]="['/updategroup', groupe.id]" class="btn-action btn-correct">
             <i class="fas fa-edit"></i>
@@ -44,13 +37,11 @@
       </div>
     </div>
 
-    <!-- Message si aucun groupe trouvé -->
     <div *ngIf="filteredGroupes && filteredGroupes.length === 0" class="no-evaluations">
       <p>Aucun groupe trouvé.</p>
     </div>
   </div>
   
-  <!-- Pagination -->
   <div class="pagination-controls">
     <div class="pagination-buttons">
       <button class="btn-pagination" (click)="previousPage()" [disabled]="currentPage === 1">

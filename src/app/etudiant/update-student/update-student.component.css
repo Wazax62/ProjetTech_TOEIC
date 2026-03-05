@@ -1,97 +1,78 @@
-/* ======= Modern Form Styles with Bold Colors ======= */
-:root {
-  --primary-color: #6C63FF;
-  --secondary-color: #FF6584;
-  --accent-color: #30D5C8;
-  --dark-color: #2A265F;
-  --light-color: #F5F5FF;
-  --gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  --icon-blue: #007bff; /* Couleur bleue pour les icônes */
+* {
+  box-sizing: border-box;
 }
 
-/* Style des icônes */
-.fas {
-  margin-right: 8px;
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f7fa;
+  color: #2c3e50;
 }
 
-/* Style spécifique pour les icônes des labels */
-.icon-label {
-  color: #007bff;
-  font-size: 1.2rem;
+.page-container {
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 110px !important;
+  padding-bottom: 50px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-/* Style spécifique pour les icônes dans les labels */
-label .fas {
-  color: var(--icon-blue);
-  font-size: 1.2rem;
-}
-
-/* Layout de la page */
-.container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Conteneur du formulaire */
 .form-container {
+  width: 100%;
   max-width: 650px;
-  margin: 60px auto;
-  background: var(--light-color);
+  background: #ffffff;
   padding: 40px;
   border-radius: 20px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
-  transform: translateZ(0);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(0,0,0,0.03);
+  animation: fadeIn 0.4s ease-out;
+  margin: 0 auto;
 }
 
 .form-container:before {
   content: '';
   position: absolute;
-  top: -5px;
+  top: 0;
   left: 0;
-  height: 10px;
+  height: 6px;
   width: 100%;
-  background: var(--gradient);
-  z-index: 1;
+  background: linear-gradient(90deg, #007bff, #00c6ff);
 }
 
 .form-container:hover {
-  box-shadow: 0 20px 40px rgba(108, 99, 255, 0.25);
-  transform: translateY(-5px);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 123, 255, 0.12);
+  transition: all 0.3s ease;
 }
 
-/* Titre */
 .title {
-  font-size: 2.5rem;
-  color: var(--dark-color);
-  margin-bottom: 30px;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 35px;
   font-weight: 700;
-  position: relative;
-  padding-bottom: 10px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
 }
 
-.title:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background: var(--gradient);
-  border-radius: 2px;
+.title .fas, .title-icon {
+  color: #007bff;
+  font-size: 2.2rem;
 }
 
-/* Formulaire */
 .standard-form {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
-/* Structure des champs */
 .row {
   display: flex;
   gap: 20px;
@@ -108,75 +89,73 @@ label .fas {
   width: calc(50% - 10px);
 }
 
-/* Labels */
 .form-group label {
-  display: block;
-  margin-bottom: 12px;
-  font-weight: 600;
-  color: var(--dark-color);
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  transition: all 0.3s;
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  gap: 8px;
 }
 
-/* Inputs et selects */
+.form-group label .fas, .icon-label {
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
 .form-control {
   width: 100%;
   padding: 15px 20px;
-  font-size: 1.05rem;
-  border: 2px solid #e0e0ff;
+  font-size: 1rem;
+  border: 1px solid #dee2e6;
   border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.8);
-  transition: all 0.3s;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+  color: #333;
+  font-family: inherit;
 }
 
 .form-control:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 5px 15px rgba(108, 99, 255, 0.15);
+  border-color: #007bff;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
   outline: none;
-  transform: translateY(-2px);
 }
 
-/* Style spécifique pour les selects */
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%236C63FF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
   background-repeat: no-repeat;
   background-position: right 15px center;
-  padding-right: 40px;
+  background-size: 12px auto;
   cursor: pointer;
-  color: var(--dark-color);
+  color: #2c3e50;
   font-weight: 500;
 }
 
 select.form-control option {
-  color: var(--dark-color);
+  color: #2c3e50;
   background-color: white;
   font-weight: 500;
 }
 
-/* Force l'affichage du texte sélectionné */
 select.form-control:not([value=""]):not([value="undefined"]) {
-  color: var(--dark-color);
+  color: #2c3e50;
   font-weight: 600;
 }
 
-/* Pour les options par défaut (placeholder) */
 select.form-control option[value=""][disabled] {
   color: #8888;
   font-weight: normal;
 }
 
-/* Style pour l'affichage de la valeur sélectionnée */
 .selected-value {
   margin-top: 8px;
   padding: 8px 12px;
-  background-color: rgba(108, 99, 255, 0.1);
+  background-color: rgba(0, 123, 255, 0.1);
   border-radius: 6px;
-  color: var(--primary-color);
+  color: #007bff;
   font-weight: 500;
   font-size: 0.9rem;
   display: flex;
@@ -184,155 +163,110 @@ select.form-control option[value=""][disabled] {
 }
 
 .selected-value::before {
-  content: "\f058"; /* FontAwesome check icon */
+  content: "\f058";
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   margin-right: 8px;
-  color: var(--primary-color);
+  color: #007bff;
 }
 
-/* Messages d'erreur */
 .error-message {
-  color: #fe3f61;
-  font-size: 0.9rem;
+  color: #dc3545;
+  font-size: 0.85rem;
   margin-top: 8px;
-  padding: 10px 12px;
-  background-color: rgba(254, 63, 97, 0.1);
-  border-left: 4px solid #fe3f61;
+  padding: 8px 12px;
+  background-color: #f8d7da20;
+  border-left: 3px solid #dc3545;
   border-radius: 6px;
-  transform: translateY(5px);
-  animation: errorShake 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  animation: errorShake 0.4s ease-in-out;
 }
 
 @keyframes errorShake {
   0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
-/* Actions du formulaire */
 .form-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
+  margin-top: 35px;
   gap: 15px;
 }
 
-/* Boutons */
 .btn {
-  display: inline-block;
-  font-family: inherit;
+  flex: 1;
+  padding: 14px 20px;
   font-size: 1rem;
   font-weight: 600;
-  padding: 12px 30px;
+  border-radius: 12px;
   border: none;
-  border-radius: 30px;
   cursor: pointer;
-  position: relative; /* Nécessaire pour l'effet shine */
-  overflow: hidden;   /* Pour masquer l'animation en dehors du bouton */
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-/* Bouton de mise à jour */
 .btn-update {
-  background: linear-gradient(140deg, #2980b9, #2980b9);
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: none;
+  background-color: #007bff;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
 }
 
-.btn-update:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.6);
-  color: #fff;
+.btn-update:hover:not(:disabled) {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
 }
 
-/* Bouton de retour */
 .btn-return {
-  background: linear-gradient(45deg, #fff, #f0f0f0);
-  color: #007bff;
-  border: 2px solid #007bff;
-  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: transparent;
+  color: #6c757d;
+  border: 1px solid #ced4da;
 }
 
-.btn-return:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
-  color: #007bff;
+.btn-return:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  color: #343a40;
+  border-color: #adb5bd;
+  transform: translateY(-2px);
 }
 
-/* Effet "shine" avec pseudo-élément pour les deux boutons */
-.btn-update::before,
-.btn-return::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: skewX(-20deg);
-  transition: all 0.5s ease;
+.btn:disabled, .btn-disabled {
+  background-color: #e9ecef !important;
+  color: #adb5bd !important;
+  border: 1px solid #dee2e6 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-.btn-update:hover::before,
-.btn-return:hover::before {
-  left: 200%;
-}
-
-/* Style pour le bouton désactivé */
-.btn-disabled {
-  background: #cccccc;
-  color: #666666;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  border: none;
-}
-
-.btn-disabled:hover {
-  background: #cccccc;
-  color: #666666;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn-disabled::before {
-  display: none;
-}
-
-/* Animation */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.form-container {
-  animation: fadeIn 0.4s ease-out;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
+  .page-container {
+    padding-top: 100px !important;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
   .form-container {
-    padding: 30px 20px;
-    margin: 30px 15px;
+    padding: 25px;
+    border-radius: 16px;
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
-  
+
   .row {
     flex-direction: column;
     gap: 0;
@@ -343,15 +277,10 @@ select.form-control option[value=""][disabled] {
   }
   
   .form-actions {
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: column-reverse;
   }
   
   .btn {
     width: 100%;
-  }
-
-  .form-control {
-    padding: 12px 15px;
   }
 }
