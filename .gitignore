@@ -1,5 +1,8 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# =========================
+# FRONTEND / ANGULAR / NODE
+# =========================
 # Compiled output
 /dist
 /tmp
@@ -11,6 +14,37 @@
 npm-debug.log
 yarn-error.log
 
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# =========================
+# BACKEND / PYTHON
+# =========================
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+ENV/
+
+# Fichiers temporaires et générés par l'app
+back_end/temp/
+temp/
+*.log
+
+# =========================
+# OUTILS & IDE
+# =========================
 # IDEs and editors
 .idea/
 .project
@@ -27,15 +61,6 @@ yarn-error.log
 !.vscode/launch.json
 !.vscode/extensions.json
 .history/*
-
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
 
 # System files
 .DS_Store
