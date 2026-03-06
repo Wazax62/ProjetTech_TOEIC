@@ -9,7 +9,7 @@ import { NavbarComponent } from "../navbar/navbar.component";
   selector: 'app-score',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
-   templateUrl: './score.component.html',
+  templateUrl: './score.component.html',
   styleUrl: './score.component.css'
 })
 export class ScoreComponent implements OnInit {
@@ -25,7 +25,7 @@ export class ScoreComponent implements OnInit {
   semestres: any[] = [];
   students: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.loadSites(); // Charger tous les sites au démarrage
@@ -71,7 +71,7 @@ export class ScoreComponent implements OnInit {
       .set('semestre_id', this.selectedSemestreId!.toString())
       .set('test_id', (document.getElementById('testFilter') as HTMLSelectElement).value);
 
-    this.http.get('http://localhost:5000/api/generate-oral-pdf', { 
+    this.http.get('http://localhost:5000/api/generate-oral-pdf', {
       params: params,
       responseType: 'blob' as 'json'
     }).subscribe((response: any) => {
@@ -93,7 +93,7 @@ export class ScoreComponent implements OnInit {
       .set('semestre_id', this.selectedSemestreId!.toString())
       .set('test_id', (document.getElementById('testFilter') as HTMLSelectElement).value);
 
-    this.http.get('http://localhost:5000/api/generate-ecrit-pdf', { 
+    this.http.get('http://localhost:5000/api/generate-ecrit-pdf', {
       params: params,
       responseType: 'blob' as 'json'
     }).subscribe((response: any) => {
@@ -122,9 +122,9 @@ export class ScoreComponent implements OnInit {
 
   // Validation des filtres
   private validateFilters(): boolean {
-    if (!this.selectedSiteId || !this.selectedPromotionId || 
-        !this.selectedGroupeId || !this.selectedSemestreId || 
-        !(document.getElementById('testFilter') as HTMLSelectElement).value) {
+    if (!this.selectedSiteId || !this.selectedPromotionId ||
+      !this.selectedGroupeId || !this.selectedSemestreId ||
+      !(document.getElementById('testFilter') as HTMLSelectElement).value) {
       alert('Veuillez sélectionner tous les filtres (site, promotion, semestre, groupe et test)');
       return false;
     }
@@ -214,6 +214,8 @@ export class ScoreComponent implements OnInit {
   // Méthode pour exporter le tableau en CSV
   exportTableToCSV(filename: string): void {
     const table = document.getElementById('resultsTable') as HTMLTableElement;
+    if (!table) return; // Petite sécurité au cas où la table ne serait pas encore affichée
+
     const rows = table.querySelectorAll('tr');
     const csv: string[] = [];
 
@@ -241,34 +243,47 @@ export class ScoreComponent implements OnInit {
           if (colIndex === 0) {
             // Récupérer le nom et le prénom
             const nom = col.textContent?.trim() || '';
-            const prenom = cols[1].textContent?.trim() || '';
+            const prenom = cols[1]?.textContent?.trim() || ''; // Utilisation de ?. pour la sécurité
             cellValue = `${nom} ${prenom}`;
           } else if (colIndex === 1) {
             return; // Ignorer la colonne "Prénom" après l'avoir combinée
           }
         }
 
-        // Ajouter la valeur de la cellule au tableau
+        // Ajouter la valeur de la cellule au tableau, en gérant les guillemets
         rowData.push(`"${cellValue.replace(/"/g, '""')}"`);
       });
 
-      // Ajouter la ligne au CSV
-      csv.push(rowData.join(','));
+      // MODIFICATION ICI : Utiliser le point-virgule (;) au lieu de la virgule (,) pour séparer les colonnes
+      if (rowData.length > 0) {
+        csv.push(rowData.join(';'));
+      }
     });
 
     // Créer le fichier CSV et le télécharger
     const csvContent = csv.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // MODIFICATION ICI : Ajout du BOM UTF-8 ('\ufeff') au début du fichier pour régler le problème des accents
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    
+    // Libération de la mémoire
+    URL.revokeObjectURL(url);
   }
 
   // Charger les tests dynamiquement en fonction du site, promotion et groupe sélectionnés
   async loadTestsBySitePromotionGroupSemester(
-    siteId: number, 
-    promotionId: number, 
+    siteId: number,
+    promotionId: number,
     groupeId: number,
     semestreId: number
   ): Promise<void> {
@@ -291,8 +306,8 @@ export class ScoreComponent implements OnInit {
     this.tests = []; // Réinitialiser les tests
     if (this.selectedSiteId && this.selectedPromotionId && groupeId && this.selectedSemestreId) {
       this.loadTestsBySitePromotionGroupSemester(
-        this.selectedSiteId, 
-        this.selectedPromotionId, 
+        this.selectedSiteId,
+        this.selectedPromotionId,
         groupeId,
         this.selectedSemestreId
       );

@@ -15,19 +15,17 @@ def draw_filled_triangle(canvas, x1, y1, x2, y2, x3, y3, fill_color=colors.black
 
 def generate_toeic_pdf(pdf_filename, etudiants, test):
     c = canvas.Canvas(pdf_filename, pagesize=A4)
+    c.setTitle(f"TOEIC Test - {test.nom}")
     width, height = A4
     x_start = 80
     y_start = height - 30
     
-    # Formater la date dans un format français
+
     date_test = test.date.strftime("%A %d %B %Y").lower()
     
-    # Créer une description de cours basée sur les informations du test
+
     course_description = f"{test.nom}"
-    # if test.promotions:
-    #     course_description += f" - {', '.join([p for p in test.promotions])}"
-    
-    # Instructions par défaut avec un peu plus d'informations sur la manière de remplir les cercles
+
     instructions = (
         "Noirciez les cercles avec un crayon HB ou 2B. \n "
         "Pas de stylo. \n"
@@ -36,11 +34,6 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
     )
 
     
-    # # Description du test si disponible
-    # if test.description:
-    #     instructions = test.description
-    
-    # Loop over students and generate individual pages for each
     for etudiant in etudiants:
         name = f"{etudiant.prenom} {etudiant.nom}"
         student_number = str(etudiant.id).zfill(10)  # Pad with zeros to 10 digits
@@ -65,7 +58,7 @@ def generate_toeic_pdf(pdf_filename, etudiants, test):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, -2), 8),
-            ('FONTSIZE', (1, 4), (1, 4), 6),  # Augmenter ici (colonne 1, ligne 4 = instructions)
+            ('FONTSIZE', (1, 4), (1, 4), 6), 
             ('LEADING', (1, 4), (1, 4), 9),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
         ]))

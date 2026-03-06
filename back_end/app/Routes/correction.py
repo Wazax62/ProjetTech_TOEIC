@@ -693,8 +693,6 @@ def process_pdf_for_students(pdf_path):
     for page_number in range(pdf_document.page_count): 
         # Convertir la page en image
         page_img = pdf_to_image(pdf_path, page_num=page_number)
-
-        # print(f"\n--- Étudiant {page_number + 1} ---")
         
         # Prétraitement de l'image
         gray, edged = preprocess(page_img)  
