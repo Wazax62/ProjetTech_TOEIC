@@ -19,7 +19,7 @@ export class EtudiantComponent implements OnInit {
   students: any[] = [];
   searchText: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 6;
+  itemsPerPage: number = 12;
 
   constructor(private etudiantService: EtudiantService,private dialog: MatDialog ) {}
 
