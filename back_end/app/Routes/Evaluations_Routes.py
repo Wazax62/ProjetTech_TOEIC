@@ -182,53 +182,70 @@ def register_evaluation_routes(app):
     
     @app.route('/api/evaluations/duplicate/<int:old_test_id>', methods=['POST'])
     def duplicate_test(old_test_id):
-        """
-        Duplique un test en laissant l'utilisateur choisir (ou non) les nouvelles valeurs.
-        JSON attendu dans le body : 
-        {
-          "nom": "Nouveau nom",
-          "description": "Nouvelle desc",
-          "date": "2025-04-20T09:00:00", 
-          "site_id": 2,  
-          "promotions_ids": [1, 2],
-          "groupes_ids": [3, 4],
-          "copyReponsesProf": true
-        }
-        """
         old_test = Test.query.get_or_404(old_test_id)
         data = request.get_json() or {}
 
-        # 1) Créer le nouveau test
-        #    Soit on copie l'ancien + on écrase avec ce que l'utilisateur a fourni
-        new_test = Test(
-            nom=data.get("nom", old_test.nom + " (Copie)"),
-            description=data.get("description", old_test.description),
-            # Si "date" existe dans le JSON, on convertit depuis l'ISOString ; sinon on prend la date du jour
-            date=datetime.fromisoformat(data["date"]) if "date" in data else datetime.utcnow(),
-            site_id=data.get("site_id", old_test.site_id),
-        )
-        db.session.add(new_test)
-        db.session.commit()  # pour générer new_test.id
+        # Gestion sécurisée de la date
+        try:
+            new_date = datetime.fromisoformat(data["date"]) if data.get("date") else datetime.utcnow()
+        except ValueError:
+            new_date = datetime.utcnow()
 
-        # 2) Associer promotions si l'utilisateur en fournit
-        promotions_ids = data.get("promotions_ids", [])
+        # --- SÉCURISATION CONTRE LES "NULL" ENVOYÉS PAR LE FRONTEND ---
+        
+        # 1. Sécuriser le nom
+        nouveau_nom = data.get("nom")
+        if not nouveau_nom:  # Si la clé est absente, vide ou 'null'
+            nouveau_nom = old_test.nom + " (Copie)"
+            
+        # 2. Sécuriser la description
+        nouvelle_desc = data.get("description")
+        if nouvelle_desc is None:
+            nouvelle_desc = old_test.description
+            
+        # 3. Sécuriser le site_id (C'est lui qui causait l'erreur 500 !)
+        nouveau_site_id = data.get("site_id")
+        if not nouveau_site_id:
+            nouveau_site_id = old_test.site_id
+
+        # On crée le nouveau test avec les valeurs 100% sûres
+        new_test = Test(
+            nom=nouveau_nom,
+            description=nouvelle_desc,
+            date=new_date,
+            site_id=nouveau_site_id,
+        )
+        
+        db.session.add(new_test)
+        db.session.flush()  # Génère l'ID du nouveau test sans le verrouiller
+
+            # 2) Associer promotions (copie de l'ancien si non fourni ou liste vide)
+        promotions_ids = data.get("promotions_ids")
+        # On remplace 'is None' par 'not' pour attraper les listes vides []
+        if not promotions_ids: 
+            promotions_ids = [p.id for p in old_test.promotions]
+            
         for promo_id in promotions_ids:
             stmt = insert(test_promotion).values(test_id=new_test.id, promotion_id=promo_id)
             db.session.execute(stmt)
         
-        # 3) Associer groupes
-        groupes_ids = data.get("groupes_ids", [])
+        # 3) Associer groupes (copie de l'ancien si non fourni ou liste vide)
+        groupes_ids = data.get("groupes_ids")
+        # Pareil ici : on intercepte les listes vides envoyées par Angular
+        if not groupes_ids: 
+            groupes_ids = [g.id for g in old_test.groupes]
+            
         for grp_id in groupes_ids:
             stmt = insert(test_groupe).values(
                 test_id=new_test.id,
                 groupe_id=grp_id,
-                feuille_generee=False  # ou True, ou recopier la valeur de l'ancien test, etc.
+                feuille_generee=False
             )
             db.session.execute(stmt)
 
-        # 4) Copier les réponses prof si l'utilisateur le demande
+        # 4) Copier les réponses prof
         if data.get("copyReponsesProf", True):
-            for old_rp in old_test.reponses_prof:  # liste ReponseProf
+            for old_rp in old_test.reponses_prof:
                 new_rp = ReponseProf(
                     num_question=old_rp.num_question,
                     choix=old_rp.choix,
@@ -236,19 +253,29 @@ def register_evaluation_routes(app):
                 )
                 db.session.add(new_rp)
 
-        db.session.commit()
-
-        return jsonify({
-            "message": "Test dupliqué avec succès",
-            "new_test_id": new_test.id,
-            "new_test_nom": new_test.nom
-        }), 201
+        # SAUVEGARDE FINALE DE TOUT D'UN COUP
+        try:
+            db.session.commit()
+            return jsonify({
+                "message": "Test dupliqué avec succès",
+                "new_test_id": new_test.id,
+                "new_test_nom": new_test.nom
+            }), 201
+        except Exception as e:
+            db.session.rollback() # Annule tout en cas de problème
+            return jsonify({"error": str(e)}), 500
     
+    
+
     @app.route('/api/evaluations/<int:test_id>', methods=['DELETE'])
     def delete_evaluation(test_id):
-    # Récupérer le test en base
-       test = Test.query.get_or_404(test_id)
-    # Supprimer
-       db.session.delete(test)
-       db.session.commit()
-       return jsonify({"message": "Test supprimé en base"}), 200
+        test = Test.query.get_or_404(test_id)
+        
+        ReponseProf.query.filter_by(test_id=test_id).delete()
+        
+        ReponseEtudiant.query.filter_by(test_id=test_id).delete()
+        
+        db.session.delete(test)
+        db.session.commit()
+        
+        return jsonify({"message": "Test et ses réponses supprimés avec succès"}), 200
