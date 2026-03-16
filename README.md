@@ -25,7 +25,7 @@ Téléchargez le fichier ZIP du projet et décompressez-le dans un dossier de vo
 2. Installez les dépendances Python:
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirement.txt
    ```
 
 3. Configuration de la base de données:
