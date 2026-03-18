@@ -14,4 +14,14 @@ export class ReponseJusteService {
   createReponsesBatch(reponses: ReponseJuste[]): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/batch`, reponses);
   }
+
+  // NOUVEAU : Récupérer les réponses d'un test spécifique
+  getReponsesByTestId(testId: string | number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/test/${testId}`);
+  }
+
+  // NOUVEAU : Écraser les réponses existantes
+  updateReponses(testId: string | number, reponses: any[]): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/test/${testId}`, reponses);
+  }
 }

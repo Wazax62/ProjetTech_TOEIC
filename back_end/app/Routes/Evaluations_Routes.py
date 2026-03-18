@@ -2,6 +2,7 @@
 from datetime import datetime
 import tempfile
 import os
+from tkinter.filedialog import test
 from werkzeug.utils import secure_filename
 from flask import request, jsonify, send_file
 from sqlalchemy import insert
@@ -14,7 +15,8 @@ from app.Models.myModels import (
     Test,
     test_groupe,
     test_promotion,
-    ReponseProf
+    ReponseProf,
+    Score
 )
 from app.Routes.pdf_generator import generate_toeic_pdf
 from app.Routes.correction import process_pdf_for_students
@@ -270,12 +272,13 @@ def register_evaluation_routes(app):
     @app.route('/api/evaluations/<int:test_id>', methods=['DELETE'])
     def delete_evaluation(test_id):
         test = Test.query.get_or_404(test_id)
-        
+    
+        # Suppression des dépendances
         ReponseProf.query.filter_by(test_id=test_id).delete()
-        
         ReponseEtudiant.query.filter_by(test_id=test_id).delete()
-        
+        Score.query.filter_by(test_id=test_id).delete() # <-- Ajoutez cette ligne
+    
         db.session.delete(test)
         db.session.commit()
-        
+    
         return jsonify({"message": "Test et ses réponses supprimés avec succès"}), 200

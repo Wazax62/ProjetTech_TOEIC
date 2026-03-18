@@ -158,7 +158,7 @@ class Score(db.Model):
     test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
     
     etudiant = db.relationship('Etudiant', backref='scores')
-    test = db.relationship('Test', backref='scores')
+    test = db.relationship('Test', backref=db.backref('scores', cascade='all, delete-orphan'))
     
     def to_dict(self):
         return {
@@ -179,8 +179,7 @@ class ReponseProf(db.Model):
     choix = db.Column(db.String(2), nullable=False)  # Choix correct (ex: A, B, C, D)
     test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
     
-    test = db.relationship('Test', backref='reponses_prof')
-    
+    test = db.relationship('Test', backref=db.backref('reponses_prof', cascade='all, delete-orphan'))    
     def to_dict(self):
         return {
             'id': self.id,
@@ -201,8 +200,7 @@ class ReponseEtudiant(db.Model):
     
     # Suppression des 4 colonnes et de leurs relations
     etudiant = db.relationship('Etudiant', backref='reponses_etudiant')
-    test = db.relationship('Test', backref='reponses_etudiant')
-    
+    test = db.relationship('Test', backref=db.backref('reponses_etudiant', cascade='all, delete-orphan'))    
     def to_dict(self):
         return {
             'id': self.id,

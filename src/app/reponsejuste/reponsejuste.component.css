@@ -20,44 +20,50 @@ h1 {
   margin-bottom: 30px;
 }
 
-/* Grid layout pour afficher les questions en grille */
+/* Transformation du conteneur en grille à 5 colonnes */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(5, 1fr); /* Crée exactement 5 colonnes de même largeur */
+  gap: 20px; /* Espace entre les questions (en haut/bas et sur les côtés) */
+  margin-top: 20px;
 }
 
+/* Optionnel : Un petit style pour rendre chaque bloc question un peu plus joli */
 .grid-item {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centre le contenu du bloc */
 }
 
+/* Style pour le numéro de la question (Q1, Q2...) */
 .question-label {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #333;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
 }
 
-/* Style pour le groupe de boutons radio */
+/* Aligner les boutons radio proprement */
 .radio-group {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .radio-label {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 14px;
   cursor: pointer;
-  user-select: none;
-  color: #0d5892;
+}
+
+/* Espacement entre la lettre (A, B...) et le bouton radio */
+.radio-label span {
+  margin-bottom: 5px;
+  font-size: 0.9rem;
 }
 
 .radio-label input {

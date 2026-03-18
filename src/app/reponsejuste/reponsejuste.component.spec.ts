@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ReponsejusteComponent } from './reponsejuste.component';
+import { ReponseJusteComponent } from './reponsejuste.component';
 
 describe('ReponsejusteComponent', () => {
-  let component: ReponsejusteComponent;
-  let fixture: ComponentFixture<ReponsejusteComponent>;
+  let component: ReponseJusteComponent;
+  let fixture: ComponentFixture<ReponseJusteComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReponsejusteComponent]
+      imports: [ReponseJusteComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ReponsejusteComponent);
+    fixture = TestBed.createComponent(ReponseJusteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

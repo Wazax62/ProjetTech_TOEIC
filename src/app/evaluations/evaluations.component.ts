@@ -83,7 +83,7 @@ export class EvaluationsComponent implements OnInit {
   }
 
   // 3) Télécharger la feuille de réponse (CORRIGÉ)
-  viewResponseSheet(testId: number, groupeId: number) {
+  viewResponseSheet(testId: number, groupeId: number,testTitle: string, groupeName: string, testDate: string): void {
     this.loadingButtonId = `btn-${testId}-${groupeId}`; // Active le spinner sur le bouton
 
     // Appel direct à l'API pour récupérer le fichier
@@ -101,7 +101,7 @@ export class EvaluationsComponent implements OnInit {
         // Création d'un lien <a> invisible
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Evaluation_${testId}_Groupe_${groupeId}.pdf`; // Nom du fichier téléchargé
+        a.download = `Groupe_${groupeName}||Test_${testTitle}.pdf`; // Nom du fichier téléchargé
         document.body.appendChild(a); // On l'ajoute au DOM
         a.click(); // On simule le clic
         a.remove(); // On le supprime

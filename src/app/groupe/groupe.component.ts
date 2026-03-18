@@ -37,19 +37,21 @@ export class GroupeComponent implements OnInit {
 
   // Supprimer un groupe
   async deleteGroupe(groupeId: number): Promise<void> {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) {
+    // Message d'avertissement mis à jour
+    if (confirm('ATTENTION : Êtes-vous sûr de vouloir supprimer ce groupe ? Cela supprimera également TOUS les étudiants de ce groupe ainsi que leurs scores et leurs réponses de test !')) {
       try {
         await this.groupeService.deleteGroupe(groupeId);
-        console.log('Groupe supprimé avec succès');
+        console.log('Groupe et données associés supprimés avec succès');
         await this.loadGroupes(); // Recharger la liste des groupes après suppression
 
         // Ouvrir la boîte de dialogue de succès
         this.dialog.open(SuccessDialogComponent, {
-          width: '300px',
-          data: { message: 'Le groupe a été supprimé avec succès !' },
+          width: '350px',
+          data: { message: 'Le groupe et tous ses étudiants ont été supprimés !' },
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erreur lors de la suppression du groupe', error);
+        alert(error.message || 'Une erreur est survenue lors de la suppression.'); 
       }
     }
   }

@@ -241,31 +241,14 @@ def preprocess(image):
 def pdf_to_image(pdf_path, page_num=0, zoom=2.0):
     """
     Convertit une page d'un fichier PDF en image.
-    
-    Args:
-        pdf_path: Chemin du fichier PDF
-        page_num: Numéro de la page à convertir (0-indexé)
-        zoom: Facteur de zoom pour la conversion
-        
-    Returns:
-        Image OpenCV (BGR)
     """
-    # Ouvrir le document PDF
-    pdf_document = fitz.open(pdf_path)
-    
-    # Charger la page spécifiée
-    page = pdf_document.load_page(page_num)
-    
-    # Définir la matrice de transformation pour le zoom
-    matrix = fitz.Matrix(zoom, zoom)
-    
-    # Obtenir la représentation pixmap de la page
-    pix = page.get_pixmap(matrix=matrix)
-    
-    # Convertir en image PIL
-    img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-    
-    # Convertir l'image PIL en image OpenCV
+    # Utilisation de 'with' pour garantir que le fichier est fermé après lecture !
+    with fitz.open(pdf_path) as pdf_document:
+        page = pdf_document.load_page(page_num)
+        matrix = fitz.Matrix(zoom, zoom)
+        pix = page.get_pixmap(matrix=matrix)
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        
     img_cv = np.array(img)
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2BGR)
     
@@ -676,21 +659,15 @@ def detect_student_number(image):
 def process_pdf_for_students(pdf_path):
     """
     Traite un fichier PDF contenant les feuilles de réponses des étudiants.
-    
-    Args:
-        pdf_path: Chemin vers le fichier PDF à traiter
-    
-    Returns:
-        dict: Un dictionnaire où la clé est le numéro de l'étudiant et la valeur sont ses réponses.
     """
-    # Ouvrir le document PDF
-    pdf_document = fitz.open(pdf_path)
-    
-    # Dictionnaire pour stocker les résultats
     student_results = {}
 
-    # Traiter chaque page du PDF (chaque étudiant)
-    for page_number in range(pdf_document.page_count): 
+    # Le bloc 'with' va automatiquement libérer le fichier PDF, même si une erreur survient
+    with fitz.open(pdf_path) as pdf_document:
+        page_count = pdf_document.page_count
+        
+    # On boucle sur le nombre de pages (le fichier est ré-ouvert page par page dans pdf_to_image)
+    for page_number in range(page_count): 
         # Convertir la page en image
         page_img = pdf_to_image(pdf_path, page_num=page_number)
         
@@ -699,6 +676,12 @@ def process_pdf_for_students(pdf_path):
         
         # Détecter les marqueurs triangulaires
         markers = find_markers(edged, page_img)
+        
+        # ==========================================
+        # AJOUT : Vérification de sécurité CRUCIALE
+        # ==========================================
+        if markers is None:
+            raise ValueError(f"Impossible de détecter les 4 marqueurs sur la page {page_number + 1}. Le scan est peut-être coupé ou trop bruité.")
         
         # Calculer les centres des marqueurs
         markers_center = np.array([contour_center(c) for c in markers]) 
@@ -709,46 +692,28 @@ def process_pdf_for_students(pdf_path):
         # Détecter le numéro d'étudiant dans la partie supérieure
         student_number = detect_student_number(upper_image)
         
+        # ... (le reste de votre code de cette fonction ne change pas) ...
         # Appliquer un seuillage à l'image transformée
         thresh_val, thresh_img = auto_thresh(warped)
-        #img_show(thresh_img, "Thresholded Warped Image", height=1000)
-
+        
         kernel_vertical = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 60))
         lignes_verticales = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel_vertical)
         thresh_img = cv2.subtract(thresh_img, lignes_verticales)
         
-        # Améliorer l'image seuillée
         thresh_img_dilate = cv2.dilate(thresh_img, np.ones((3, 3), np.uint8), iterations=3)
         thresh_img_erode = cv2.erode(thresh_img_dilate, np.ones((3, 3), np.uint8), iterations=3)
         thresh_img = thresh_img_erode
         
-        # Redimensionner les images pour un meilleur traitement
         thresh_img = resize(thresh_img, height=1000)
         ansROI = resize(ansROI, height=1000)
         
-        # Enlever les bords (qui peuvent contenir des artefacts)
         thresh_img = thresh_img[10:-10, 10:-10]
         ansROI = ansROI[10:-10, 10:-10]
         
-        # Métadonnées pour la détection des questions
-        metadata = {"n_questions": 200}  
-        
-        # Détecter les sections, colonnes et les cercles de réponses
         question_circles = detect_sections_columns_and_contours(thresh_img, ansROI)
-        
-        # Vérifier les réponses de l'étudiant
         student_answers = check_answers(question_circles, ansROI)
-        # print(student_answers)
-        
-        # Ajouter les résultats au dictionnaire avec le numéro d'étudiant comme clé
         student_results[student_number] = student_answers
-        """img_show(warped, "Warped Image with Detected Circles", height=1000)
-        img_show(ansROI, "Answer ROI", height=1000)
-        img_show(upper_image, "Upper Image", height=1000)
-        img_show(thresh_img_erode, "Thresholded Image", height=1000)
-        img_show(thresh_img_dilate, "Detected Squares and Circles", height=1000)
-    """
-    print(student_results)
+
     return student_results
 
         

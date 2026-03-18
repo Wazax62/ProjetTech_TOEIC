@@ -6,25 +6,35 @@ import { EtudiantService } from '../etudiant.service';
 import { MatDialog } from '@angular/material/dialog';  
 import { SuccessDialogComponent } from '../success-dialog/success-dialog.component';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { GroupeService } from '../services/groupe.service';
 
 
 @Component({
   selector: 'app-etudiant',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule,NavbarComponent],
+  imports: [CommonModule, RouterModule, FormsModule, NavbarComponent],
   templateUrl: './etudiant.component.html',
   styleUrls: ['./etudiant.component.css'],
 })
 export class EtudiantComponent implements OnInit {
   students: any[] = [];
+  groupes: any[] = []; // <-- Liste des groupes pour le menu déroulant
+  
   searchText: string = '';
+  selectedGroupe: string = ''; // <-- Stocke le nom du groupe sélectionné
+  
   currentPage: number = 1;
   itemsPerPage: number = 12;
 
-  constructor(private etudiantService: EtudiantService,private dialog: MatDialog ) {}
+  constructor(
+    private etudiantService: EtudiantService,
+    private groupeService: GroupeService, // <-- Injection du service
+    private dialog: MatDialog 
+  ) {}
 
   ngOnInit(): void {
     this.loadStudents();
+    this.loadGroupes(); // <-- Charger les groupes au démarrage
   }
 
   async loadStudents(): Promise<void> {
@@ -36,67 +46,68 @@ export class EtudiantComponent implements OnInit {
     }
   }
 
-deleteStudent(studentId: number): void {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?')) {
-    fetch(`http://localhost:5000/api/etudiants/${studentId}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log('Étudiant supprimé avec succès');
-          this.loadStudents();  // Recharger la liste des étudiants après suppression
+  async loadGroupes(): Promise<void> {
+    // On récupère les groupes pour alimenter la liste déroulante
+    try {
+      this.groupes = await this.groupeService.getGroupes();
+    } catch (error) {
+      console.error('Erreur lors du chargement des groupes:', error);
+    }
+  }
 
-          // Ouvrir la boîte de dialogue de succès
-          this.dialog.open(SuccessDialogComponent, {
-            width: '300px',
-            data: { message: "L'étudiant a été supprimé avec succès !" },
-          });
-        } else {
-          console.error('Erreur lors de la suppression de l\'étudiant');
-        }
+  deleteStudent(studentId: number): void {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?')) {
+      fetch(`http://localhost:5000/api/etudiants/${studentId}`, {
+        method: 'DELETE',
       })
-      .catch((error) => {
-        console.error('Erreur lors de la suppression de l\'étudiant', error);
-      });
-  }
-}
+        .then((response) => {
+          if (response.ok) {
+            console.log('Étudiant supprimé avec succès');
+            this.loadStudents();  // Recharger la liste des étudiants après suppression
 
-
-get filteredStudents() {
-    return this.students
-      .filter(
-        (student) =>
-          // Recherche par nom et prénom
-          `${student.nom} ${student.prenom}`.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          // Recherche par groupe
-          student.groupe.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          // Recherche par spécialité
-          student.specialite.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          // Recherche par site
-          student.site.toLowerCase().includes(this.searchText.toLowerCase())
-      )
-      .slice(
-        (this.currentPage - 1) * this.itemsPerPage,
-        this.currentPage * this.itemsPerPage
-      );
+            // Ouvrir la boîte de dialogue de succès
+            this.dialog.open(SuccessDialogComponent, {
+              width: '300px',
+              data: { message: "L'étudiant a été supprimé avec succès !" },
+            });
+          } else {
+            console.error('Erreur lors de la suppression de l\'étudiant');
+          }
+        })
+        .catch((error) => {
+          console.error('Erreur lors de la suppression de l\'étudiant', error);
+        });
+    }
   }
 
- /* get filteredStudents() {
-    return this.students
-      .filter(
-        (student) =>
-          student.nom.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          student.prenom.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          student.groupe.toLowerCase().includes(this.searchText.toLowerCase())
-      )
-      .slice(
-        (this.currentPage - 1) * this.itemsPerPage,
-        this.currentPage * this.itemsPerPage
-      );
+  // Étape intermédiaire : filtrer la liste globale (recherche texte + liste déroulante)
+  get baseFilteredStudents() {
+    return this.students.filter((student) => {
+      // 1. Filtre par texte (barre de recherche)
+      const matchesSearch = 
+        `${student.nom} ${student.prenom}`.toLowerCase().includes(this.searchText.toLowerCase()) ||
+        student.groupe.toLowerCase().includes(this.searchText.toLowerCase()) ||
+        student.specialite.toLowerCase().includes(this.searchText.toLowerCase()) ||
+        student.site.toLowerCase().includes(this.searchText.toLowerCase());
+
+      // 2. Filtre par groupe (menu déroulant)
+      const matchesGroupe = this.selectedGroupe ? student.groupe === this.selectedGroupe : true;
+
+      return matchesSearch && matchesGroupe;
+    });
   }
-*/
+
+  // Étape finale : appliquer la pagination sur la liste déjà filtrée
+  get filteredStudents() {
+    return this.baseFilteredStudents.slice(
+      (this.currentPage - 1) * this.itemsPerPage,
+      this.currentPage * this.itemsPerPage
+    );
+  }
+
+  // Le nombre de pages s'adapte dynamiquement selon les filtres
   get totalPages() {
-    return Math.ceil(this.students.length / this.itemsPerPage);
+    return Math.ceil(this.baseFilteredStudents.length / this.itemsPerPage) || 1;
   }
 
   previousPage() {

@@ -59,12 +59,34 @@ def init_groupe_routes(app):
             groupe = Groupe.query.get(id)
             if not groupe:
                 return jsonify({'message': 'Groupe not found'}), 404
+
+            # 1. Supprimer "en cascade" les étudiants et leurs dépendances
+            for etudiant in groupe.etudiants:
+                # A. Supprimer les scores de l'étudiant
+                for score in etudiant.scores:
+                    db.session.delete(score)
+                    
+                # B. Supprimer les réponses de l'étudiant
+                for reponse in etudiant.reponses_etudiant:
+                    db.session.delete(reponse)
+                    
+                # C. Supprimer l'étudiant lui-même
+                db.session.delete(etudiant)
+
+            # 2. Détacher le groupe de tous les tests auxquels il est lié
+            for test in groupe.tests.all():
+                test.groupes.remove(groupe)
+
+            # 3. Maintenant que le groupe est vidé, on peut le supprimer
             db.session.delete(groupe)
             db.session.commit()
-            return jsonify({'message': 'Groupe deleted successfully'}), 200
+
+            return jsonify({'message': 'Groupe, étudiants et données associés supprimés avec succès'}), 200
+            
         except Exception as e:
-            app.logger.error(f"Erreur : {e}")
-            return jsonify({'error': 'An error occurred while deleting the groupe'}), 500
+            db.session.rollback() # Important : Annuler en cas d'erreur
+            app.logger.error(f"Erreur lors de la suppression du groupe : {e}")
+            return jsonify({'error': 'Une erreur est survenue lors de la suppression du groupe'}), 500
             
     @app.route('/api/groupes/<int:id>', methods=['GET'])
     def get_groupe(id):

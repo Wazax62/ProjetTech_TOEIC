@@ -3,16 +3,21 @@
 <div class="container my-5">
   <h1 class="title">Liste des Étudiants</h1>
   
-  <!-- Barre de recherche améliorée -->
   <div class="search-bar">
-    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un étudiant..." />
+    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un étudiant, une spécialité, un site..." />
   </div>
   
-  <!-- Boutons d'action -->
   <div class="action-row">
+    
     <div class="search-filters">
-      <!-- Espace réservé pour les filtres futurs -->
+      <select class="form-select" [(ngModel)]="selectedGroupe" style="min-width: 200px; padding: 8px; border-radius: 5px;">
+        <option value="">Tous les groupes</option>
+        <option *ngFor="let groupe of groupes" [value]="groupe.nom">
+          {{ groupe.nom }}
+        </option>
+      </select>
     </div>
+
     <div class="action-buttons">
       <button class="btn-add" routerLink="/addstudent">
         <i class="fas fa-plus"></i> Ajouter un Étudiant
@@ -24,22 +29,17 @@
     </div>
   </div>
 
-  <!-- Conteneur de cards -->
   <div class="grid-card-container">
-    <!-- Boucle sur les étudiants filtrés -->
     <div class="fancy-card" *ngFor="let student of filteredStudents">
       <div class="card-body">
-        <!-- Titre (nom + prénom) -->
         <h3 class="card-title">{{ student.nom }} {{ student.prenom }}</h3>
 
-        <!-- Informations sur l'étudiant -->
         <p class="card-group"><i class="fas fa-graduation-cap"></i> Promotion: {{ student.promotion }}</p>
         <p class="card-group"><i class="fas fa-calendar-alt"></i> Semestre: {{ student.semestre }}</p>
         <p class="card-group"><i class="fas fa-users"></i> Groupe: {{ student.groupe }}</p>
         <p class="card-group"><i class="fas fa-map-marker-alt"></i> Site: {{ student.site }}</p>
         <p class="card-group"><i class="fas fa-book"></i> Spécialité: {{ student.specialite }}</p>
 
-        <!-- Boutons d'action -->
         <div class="card-actions">
           <a [routerLink]="['/update-student', student.id]" class="btn-action btn-correct">
             <i class="fas fa-edit"></i>
@@ -53,13 +53,11 @@
       </div>
     </div>
 
-    <!-- Message si aucun étudiant trouvé -->
     <div *ngIf="filteredStudents.length === 0" class="no-evaluations">
-      <p>Aucun étudiant trouvé.</p>
+      <p>Aucun étudiant ne correspond à votre recherche.</p>
     </div>
   </div>
 
-  <!-- Pagination -->
   <div class="pagination-controls">
     <div class="pagination-buttons">
       <button class="btn-pagination" (click)="previousPage()" [disabled]="currentPage === 1">

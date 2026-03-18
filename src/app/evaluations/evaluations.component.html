@@ -35,7 +35,7 @@
         <div class="card-actions">
           <button class="btn-action btn-download" 
                 [id]="'btn-' + evaluation.test_id + '-' + evaluation.groupe_id"
-                (click)="viewResponseSheet(evaluation.test_id, evaluation.groupe_id)"
+                (click)="viewResponseSheet(evaluation.test_id, evaluation.groupe_id, evaluation.test_title, evaluation.groupe_name,evaluation.test_date)"
                 [disabled]="loadingButtonId === 'btn-' + evaluation.test_id + '-' + evaluation.groupe_id">
             <i class="fas fa-download"></i>
             <span>Télécharger</span>

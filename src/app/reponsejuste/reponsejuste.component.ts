@@ -36,11 +36,12 @@ export class ReponseJusteComponent implements OnInit {
       for (let i = 1; i <= 200; i++) {
         this.configQuestions.push({
           numero_question: i,
-          choix: 'A'
+          choix: ''
         });
       }
     }
   }
+
 
   onSaveConfig(): void {
     // Vérification que toutes les questions ont une réponse
