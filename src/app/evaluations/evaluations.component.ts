@@ -40,7 +40,7 @@ export class EvaluationsComponent implements OnInit {
     nom: '',
     description: '',
     date: '',
-    site_id: null as number|null,
+    site_id: null as number | null,
     promotions_ids: [] as number[],
     groupes_ids: [] as number[],
     copyReponsesProf: true
@@ -53,7 +53,7 @@ export class EvaluationsComponent implements OnInit {
 
   constructor(
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getTestsAndGroups();
@@ -83,40 +83,40 @@ export class EvaluationsComponent implements OnInit {
   }
 
   // 3) Télécharger la feuille de réponse (CORRIGÉ)
-  viewResponseSheet(testId: number, groupeId: number,testTitle: string, groupeName: string, testDate: string): void {
-    this.loadingButtonId = `btn-${testId}-${groupeId}`; // Active le spinner sur le bouton
+  viewResponseSheet(testId: number, groupeId: number, testTitle: string, groupeName: string, testDate: string): void {
+    this.loadingButtonId = `btn-${testId}-${groupeId}`; // Active le spinner sur le bouton
 
     // Appel direct à l'API pour récupérer le fichier
-    fetch(`http://localhost:5000/api/generateresponsesheet/${testId}/${groupeId}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erreur réseau lors du téléchargement');
-        }
-        return response.blob(); // On récupère le fichier en mode "Blob"
-      })
-      .then(blob => {
+    fetch(`http://localhost:5000/api/generateresponsesheet/${testId}/${groupeId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erreur réseau lors du téléchargement');
+        }
+        return response.blob(); // On récupère le fichier en mode "Blob"
+      })
+      .then(blob => {
         // Création d'une URL temporaire pour le fichier
-        const url = window.URL.createObjectURL(blob);
-        
+        const url = window.URL.createObjectURL(blob);
+
         // Création d'un lien <a> invisible
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Groupe_${groupeName}||Test_${testTitle}.pdf`; // Nom du fichier téléchargé
-        document.body.appendChild(a); // On l'ajoute au DOM
-        a.click(); // On simule le clic
-        a.remove(); // On le supprime
-        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Groupe_${groupeName}||Test_${testTitle}.pdf`; // Nom du fichier téléchargé
+        document.body.appendChild(a); // On l'ajoute au DOM
+        a.click(); // On simule le clic
+        a.remove(); // On le supprime
+
         // Libération de la mémoire
-        window.URL.revokeObjectURL(url);
-      })
-      .catch(error => {
-        console.error('Erreur téléchargement:', error);
-        alert("Impossible de télécharger le fichier.");
-      })
-      .finally(() => {
-        this.loadingButtonId = null; // Désactive le spinner
-      });
-  }
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Erreur téléchargement:', error);
+        alert("Impossible de télécharger le fichier.");
+      })
+      .finally(() => {
+        this.loadingButtonId = null; // Désactive le spinner
+      });
+  }
 
   // 4) Ouvrir la modale de Correction
   openUploadModal(evaluation: any) {
@@ -165,23 +165,23 @@ export class EvaluationsComponent implements OnInit {
       method: 'POST',
       body: formData,
     })
-    .then(response => response.json().then(data => {
-      if (!response.ok) {
-        throw new Error(data.error || `Erreur HTTP: ${response.status}`);
-      }
-      return data;
-    }))
-    .then((data: { message: string; saved_count: number; student_count: number }) => {
-      alert(`${data.message}\nRéponses enregistrées: ${data.saved_count} pour ${data.student_count} étudiants.`);
-      if (fileInput) fileInput.value = '';
-    })
-    .catch(error => {
-      console.error('Erreur:', error);
-      alert(`Erreur: ${error.message}`);
-    })
-    .finally(() => {
-      this.isLoading = false;
-    });
+      .then(response => response.json().then(data => {
+        if (!response.ok) {
+          throw new Error(data.error || `Erreur HTTP: ${response.status}`);
+        }
+        return data;
+      }))
+      .then((data: { message: string; saved_count: number; student_count: number }) => {
+        alert(`${data.message}\nRéponses enregistrées: ${data.saved_count} pour ${data.student_count} étudiants.`);
+        if (fileInput) fileInput.value = '';
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        alert(`Erreur: ${error.message}`);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
   }
 
   // 6) Supprimer
@@ -189,35 +189,35 @@ export class EvaluationsComponent implements OnInit {
     if (!confirm("Voulez-vous vraiment supprimer ce test ?")) {
       return;
     }
-  
+
     // Appel HTTP DELETE vers l’API
     fetch(`http://localhost:5000/api/evaluations/${id}`, {
       method: 'DELETE'
     })
-    .then((response) => {
-      // Vérifier si la requête a réussi
-      if (!response.ok) {
-        throw new Error(`Erreur suppression: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data.message);
-  
-      // Si succès, on retire localement le test
-      this.testsAndGroups = this.testsAndGroups.filter(e => e.test_id !== id);
-      alert("Test supprimé avec succès !");
-    })
-    .catch((err) => {
-      console.error("Erreur lors de la suppression:", err);
-      alert("Une erreur est survenue lors de la suppression du test.");
-    });
+      .then((response) => {
+        // Vérifier si la requête a réussi
+        if (!response.ok) {
+          throw new Error(`Erreur suppression: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data.message);
+
+        // Si succès, on retire localement le test
+        this.testsAndGroups = this.testsAndGroups.filter(e => e.test_id !== id);
+        alert("Test supprimé avec succès !");
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la suppression:", err);
+        alert("Une erreur est survenue lors de la suppression du test.");
+      });
   }
 
   // =========================================================
   // DUPLICATION
   // =========================================================
-  
+
   // 7) Ouvrir la modale de duplication
   openDuplicateModal(evaluation: any) {
     this.showDuplicateModal = true;
@@ -255,22 +255,22 @@ export class EvaluationsComponent implements OnInit {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(data => {
-      if (!data.new_test_id) {
-        throw new Error("Impossible de dupliquer le test");
-      }
-      alert(`Test dupliqué avec succès ! ID = ${data.new_test_id}`);
-      // Option : recharger la liste
-      this.getTestsAndGroups();
+      .then(res => res.json())
+      .then(data => {
+        if (!data.new_test_id) {
+          throw new Error("Impossible de dupliquer le test");
+        }
+        alert(`Test dupliqué avec succès ! ID = ${data.new_test_id}`);
+        // Option : recharger la liste
+        this.getTestsAndGroups();
 
-      // Fermer la modale
-      this.showDuplicateModal = false;
-    })
-    .catch(err => {
-      console.error("Erreur duplication:", err);
-      alert("Une erreur est survenue lors de la duplication.");
-    });
+        // Fermer la modale
+        this.showDuplicateModal = false;
+      })
+      .catch(err => {
+        console.error("Erreur duplication:", err);
+        alert("Une erreur est survenue lors de la duplication.");
+      });
   }
 
   // =========================================================
