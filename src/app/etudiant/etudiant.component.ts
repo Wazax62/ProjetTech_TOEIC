@@ -24,7 +24,7 @@ export class EtudiantComponent implements OnInit {
   selectedGroupe: string = ''; // <-- Stocke le nom du groupe sélectionné
   
   currentPage: number = 1;
-  itemsPerPage: number = 12;
+  itemsPerPage: number = 15;
 
   constructor(
     private etudiantService: EtudiantService,
