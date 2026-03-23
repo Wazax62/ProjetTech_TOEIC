@@ -480,6 +480,14 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
     
     raw_squares = []
 
+    # ==================================================
+    # PREPARATION DES IMAGES DE DEBUG (Copies de l'image)
+    # ==================================================
+    debug_raw = ansROI.copy()     # Étape 1 : Tous les contours
+    debug_size = ansROI.copy()    # Étape 2 : Filtre de taille
+    debug_aligned = ansROI.copy() # Étape 3 : Ligne médiane
+    debug_purple = ansROI.copy()  # Étape 4 : Numéros finaux isolés
+
     # DÉCOUPAGE STRICT EN 4 COLONNES (Plus de fusion accidentelle !)
     num_columns = 4
     col_width = img_w // num_columns
@@ -492,9 +500,17 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
         col_squares = []
         for cnt in contours_col:
             x_cont, y_cont, w_cont, h_cont = cv2.boundingRect(cnt)
+            x_real = col_x + x_cont # Coordonnée X réelle sur l'image complète
+            
+            # --- DEBUG ÉTAPE 1 : TOUS les contours trouvés (Rouge fin) ---
+            cv2.rectangle(debug_raw, (x_real, y_cont), (x_real + w_cont, y_cont + h_cont), (0, 0, 255), 1)
+
             # On cherche les objets qui ont la taille d'un numéro
             if w_cont <= max_square_dim and h_cont <= max_square_dim and x_cont > 0 and y_cont > 0:  
-                col_squares.append((col_x + x_cont, y_cont, w_cont, h_cont, i))
+                col_squares.append((x_real, y_cont, w_cont, h_cont, i))
+                
+                # --- DEBUG ÉTAPE 2 : Contours à la bonne taille (Orange épais) ---
+                cv2.rectangle(debug_size, (x_real, y_cont), (x_real + w_cont, y_cont + h_cont), (0, 165, 255), 2)
         
         # FILTRE D'ALIGNEMENT : Les vrais numéros sont tous parfaitement alignés verticalement
         if col_squares:
@@ -503,6 +519,12 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
             # On ne garde que les carrés qui sont alignés sur cet axe X (tolérance de 15px)
             aligned_squares = [sq for sq in col_squares if abs(sq[0] - median_x) < 15]
             raw_squares.extend(aligned_squares)
+
+            # --- DEBUG ÉTAPE 3 : Alignement vertical (Jaune) ---
+            # On dessine la ligne médiane de la colonne
+            cv2.line(debug_aligned, (int(median_x), 0), (int(median_x), img_h), (0, 255, 255), 1)
+            for sq in aligned_squares:
+                cv2.rectangle(debug_aligned, (sq[0], sq[1]), (sq[0] + sq[2], sq[1] + sq[3]), (0, 255, 255), 2)
 
     # Trier par Colonne, puis par position verticale (Y), puis horizontale (X)
     raw_squares.sort(key=lambda x: (x[4], x[1], x[0]))
@@ -519,7 +541,48 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
             if sq[4] == prev_sq[4] and abs(sq[1] - prev_sq[1]) < 15:
                 continue 
             purple_squares.append(sq)
+
+    # =========================================================
+    # AUTO-COMPLÉTION DE LA DERNIÈRE LIGNE (Ou des lignes manquantes)
+    # =========================================================
+    repaired_squares = []
+    QUESTIONS_PAR_COLONNE = 50 # Le nombre exact de questions attendues par colonne
+    
+    for i in range(num_columns):
+        # On isole les numéros trouvés dans cette colonne
+        col_sqs = [sq for sq in purple_squares if sq[4] == i]
+        
+        if len(col_sqs) > 1:
+            # On s'assure qu'ils sont bien triés de haut en bas
+            col_sqs.sort(key=lambda x: x[1])
             
+            # On calcule l'écartement moyen (en pixels) entre deux numéros consécutifs
+            y_coords = [sq[1] for sq in col_sqs]
+            ecart_moyen = np.median(np.diff(y_coords))
+            
+            # Si on a trouvé moins de 50 questions, on recrée les manquantes à la suite !
+            while len(col_sqs) < QUESTIONS_PAR_COLONNE:
+                last_sq = col_sqs[-1]
+                
+                # On descend d'un "étage"
+                new_y = int(last_sq[1] + ecart_moyen)
+                
+                # On recrée un numéro fantôme : (x, y, largeur, hauteur, colonne)
+                new_sq = (last_sq[0], new_y, last_sq[2], last_sq[3], i)
+                col_sqs.append(new_sq)
+                
+        repaired_squares.extend(col_sqs)
+
+    # On remplace l'ancienne liste incomplète par notre liste parfaite de 200 questions
+    purple_squares = repaired_squares
+    # =========================================================
+            
+    # --- DEBUG ÉTAPE 4 : Résultat Anti-Doublons + Auto-complétion (Violet) ---
+    for sq in purple_squares:
+        cv2.rectangle(debug_purple, (sq[0], sq[1]), (sq[0] + sq[2], sq[1] + sq[3]), (255, 0, 255), 2)
+
+
+
     question_number = 1
     question_circles = {}
     colors_list = [(0, 0, 255), (0, 255, 0), (255, 0, 0), (0, 255, 255)]
@@ -554,6 +617,9 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
         question_number += 1
 
     img_pil.save("debug_cercles_finaux.jpg")
+    img_bgr = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    
+    
     return question_circles
 
 def check_answers(question_circles, img):
@@ -735,8 +801,6 @@ def detect_student_number(image):
             break
     student_number = std_clean 
 
-    cv2.imshow("Detection", image_with_squares)
-    cv2.waitKey(0)
 
     return student_number
         
@@ -780,7 +844,6 @@ def process_pdf_for_students(pdf_path):
         
         # Appliquer la transformation et découper les régions
         ansROI, warped, upper_image, m_transform = warpcrop(page_img, gray, markers_center)
-        
         # Détecter le numéro d'étudiant dans la partie supérieure
         student_number = detect_student_number(upper_image)
         
@@ -801,11 +864,10 @@ def process_pdf_for_students(pdf_path):
         
         thresh_img = thresh_img[10:-10, 10:-10]
         ansROI = ansROI[10:-10, 10:-10]
-        
+
         question_circles = detect_sections_columns_and_contours(thresh_img, ansROI)
         student_answers = check_answers(question_circles, ansROI)
         student_results[student_number] = student_answers
-        print(student_number,page_number + 1)
         #img_show(ansROI, f"Réponses de l'étudiant {student_number} - Page {page_number + 1}", height=800)
 
     return student_results
