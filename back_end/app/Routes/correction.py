@@ -205,37 +205,29 @@ def img_show(img, window_name, width=None, height=None):
 
 def preprocess(image):
     """
-    Prétraite une image pour la détection des contours.
-    
-    Args:
-        image: Image d'entrée BGR
-        
-    Returns:
-        Tuple contenant l'image en niveaux de gris et les contours détectés
+    Prétraite une image pour la détection des contours avec normalisation de l'éclairage.
     """
-    # Appliquer un filtre bilatéral pour réduire le bruit
-    blurred = cv2.bilateralFilter(image, 2, 200, 200)
+    # 1. Filtre bilatéral pour réduire le bruit tout en gardant des bords nets
+    # (J'ai légèrement augmenté les paramètres pour mieux lisser le grain de papier)
+    blurred = cv2.bilateralFilter(image, 9, 75, 75)
     
-    # Convertir en niveaux de gris
+    # 2. Convertir en niveaux de gris
     gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
 
-    # Détecter les contours
-    edged = auto_canny(gray)
+    # 3. NOUVEAU : Normalisation du contraste (CLAHE)
+    # Permet de rattraper les zones d'ombre ou de sur-exposition du scan
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    gray_clahe = clahe.apply(gray)
+
+    # 4. Détecter les contours sur l'image corrigée
+    edged = auto_canny(gray_clahe)
     
-    # Dilater les contours pour fermer les petites discontinuités
+    # 5. Dilater puis éroder pour fermer les petites discontinuités (Fermeture morphologique)
     edged_dilate = cv2.dilate(edged, np.ones((3, 3), np.uint8), iterations=1)
-    
-    # Éroder pour affiner les contours
     edged_erode = cv2.erode(edged_dilate, np.ones((3, 3), np.uint8), iterations=1)
 
-    # Décommenter pour afficher les étapes intermédiaires
-    # img_show(blurred, "Blurred Image", height=950)
-    # img_show(gray, "Gray Image", height=950)
-    # img_show(edged, "Edges", height=950)
-    # img_show(edged_dilate, "Dilated Edges", height=950)
-    # img_show(edged_erode, "Eroded Edges", height=950)
-
-    return (gray, edged_dilate)
+    # On renvoie bien gray (pour la suite de ton code) et edged_erode (pour les marqueurs)
+    return (gray, edged_erode)
 
 
 def pdf_to_image(pdf_path, page_num=0, zoom=2.0):
@@ -293,70 +285,139 @@ def contour_center(contour):
         return (cx, cy)
     else:
         return (0, 0)
-
-
 import cv2
 import numpy as np
 
 def find_markers(edged, image=None):
-    """
-    Trouve les marqueurs triangulaires de manière robuste dans une image bruitée.
-    """
-    # 1. Petit nettoyage morphologique pour boucher les trous dans les contours
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel)
-
-    # 2. Trouver les contours
-    cnts, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    if not cnts or image is None:
+    if image is None:
         return None
 
-    markers = []
-    markers_info = [] # Pour stocker (contour, aire, score_de_proximité)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+    cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    candidates = []
+    
+    # 1. On récupère TOUS les candidats qui ressemblent de près ou de loin à un marqueur
+    for c in cnts:
+        area = cv2.contourArea(c)
+        if 150 < area < 1500: 
+            rect = cv2.minAreaRect(c)
+            w, h = rect[1]
+            if w > 0 and h > 0:
+                aspect_ratio = max(w, h) / min(w, h)
+                if 0 < aspect_ratio < 2.8:
+                    fill_ratio = area / (w * h)
+                    if 0.35 < fill_ratio < 0.65:
+                        peri = cv2.arcLength(c, True)
+                        approx = cv2.approxPolyDP(c, 0.05 * peri, True)
+                        
+                        if 3 <= len(approx) <= 5:
+                            # ON AJOUTE LE CENTRE DU TRIANGLE POUR NOTRE CALCUL SPATIAL
+                            M = cv2.moments(approx)
+                            if M["m00"] != 0:
+                                cx = int(M["m10"] / M["m00"])
+                                cy = int(M["m01"] / M["m00"])
+                                candidates.append((approx, cx, cy))
 
+    if len(candidates) < 4:
+        print(f"Erreur : Seulement {len(candidates)} candidats trouvés.")
+        return None
+
+    # 2. L'IDÉE DE GÉNIE : Le tri par position spatiale
+    # On récupère les dimensions de la page scannée
+    height, width = image.shape[:2]
+    
+    # On cherche le candidat le plus proche de chaque coin (Théorème de Pythagore)
+    
+    # Haut-Gauche (Top-Left) : Coordonnées (0, 0)
+    tl = min(candidates, key=lambda c: c[1]**2 + c[2]**2)
+    
+    # Haut-Droite (Top-Right) : Coordonnées (width, 0)
+    tr = min(candidates, key=lambda c: (c[1] - width)**2 + c[2]**2)
+    
+    # Bas-Gauche (Bottom-Left) : Coordonnées (0, height)
+    bl = min(candidates, key=lambda c: c[1]**2 + (c[2] - height)**2)
+    
+    # Bas-Droite (Bottom-Right) : Coordonnées (width, height)
+    br = min(candidates, key=lambda c: (c[1] - width)**2 + (c[2] - height)**2)
+    
+    # On extrait uniquement les contours de nos 4 gagnants
+    markers = [tl[0], tr[0], br[0], bl[0]]
+
+    # Petite sécurité : on vérifie qu'on n'a pas sélectionné le même triangle pour deux coins différents
+    # (ce qui arriverait si tout un côté de la page est rogné)
+    unique_markers = {tuple(m.flatten()) for m in markers}
+    if len(unique_markers) < 4:
+         print("Erreur : Impossible de trouver un marqueur distinct pour chaque coin.")
+         return None
+         
+
+    # Affichage
+    img_markers = image.copy()
+    cv2.drawContours(img_markers, markers, -1, (0, 255, 0), 3)
+    #img_show(img_markers, "Marqueurs détectés", height=800)
+
+    return markers
+
+
+def debug_markers(image):
+    """
+    Affiche tous les contours détectés avec leurs statistiques mathématiques
+    pour comprendre pourquoi l'algorithme les rejette.
+    """
+    if image is None:
+        print("Erreur : Aucune image fournie au débogueur.")
+        return
+
+    # On crée une copie pour dessiner dessus
+    debug_img = image.copy()
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Même seuillage que notre fonction principale
+    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+    
+    cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    print(f"Débogage : {len(cnts)} contours totaux trouvés sur l'image.")
+    
     for c in cnts:
         area = cv2.contourArea(c)
         
-        # Filtre de taille (ajuste selon la résolution de ton PDF)
-        if 100 < area < 10000:
-            peri = cv2.arcLength(c, True)
-            # On augmente légèrement la tolérance (0.04 au lieu de 0.02)
-            approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+        # On ignore juste les micro-poussières de moins de 50 pixels pour ne pas polluer l'écran
+        if area > 50:
+            rect = cv2.minAreaRect(c)
+            w, h = rect[1]
             
-            # 3. Critères de sélection robustes
-            # - Entre 3 et 5 points (souvent le bruit ajoute un point)
-            # - Doit être convexe
-            if 3 <= len(approx) <= 5 and cv2.isContourConvex(approx):
-                # On calcule la bounding box pour vérifier le ratio
-                x, y, w, h = cv2.boundingRect(approx)
-                aspect_ratio = float(w) / h
+            if w > 0 and h > 0:
+                aspect_ratio = max(w, h) / min(w, h)
+                fill_ratio = area / (w * h)
                 
-                # Un triangle de marqueur est généralement assez équilibré (pas une ligne)
-                if 0.5 < aspect_ratio < 2.0:
-                    markers.append(approx)
-                    markers_info.append(area)
+                # 1. Dessiner le contour en bleu clair
+                cv2.drawContours(debug_img, [c], -1, (255, 150, 0), 2)
+                
+                # 2. Trouver le centre pour placer le texte
+                M = cv2.moments(c)
+                if M["m00"] != 0:
+                    cx = int(M["m10"] / M["m00"])
+                    cy = int(M["m01"] / M["m00"])
+                else:
+                    cx, cy = int(rect[0][0]), int(rect[0][1])
+                    
+                # 3. Écrire les stats en rouge fluo
+                text_A = f"A: {int(area)}"
+                text_R = f"R: {aspect_ratio:.1f}"
+                text_F = f"F: {fill_ratio:.2f}"
+                
+                # J'utilise une police assez petite pour que ça rentre
+                cv2.putText(debug_img, text_A, (cx - 20, cy - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
+                cv2.putText(debug_img, text_R, (cx - 20, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
+                cv2.putText(debug_img, text_F, (cx - 20, cy + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
 
-    # 4. Gestion du nombre de marqueurs
-    if len(markers) < 4:
-        print(f"Erreur : Seulement {len(markers)} marqueurs trouvés. Le PDF est peut-être trop bruité.")
-        return None
+    # Sauvegarder l'image sur ton ordinateur pour pouvoir zoomer tranquillement
+    cv2.imwrite("debug_vision_ordi.jpg", debug_img)
+    print("Image sauvegardée sous 'debug_vision_ordi.jpg' dans le dossier de ton script.")
 
-    # 5. Si on en a trop, on garde les 4 dont l'aire est la plus proche de la médiane
-    # C'est plus robuste que la moyenne car la médiane ignore les valeurs aberrantes
-    if len(markers) > 4:
-        median_area = np.median(markers_info)
-        # On trie par différence absolue avec la médiane
-        indexed_markers = sorted(enumerate(markers), 
-                                 key=lambda x: abs(cv2.contourArea(x[1]) - median_area))
-        markers = [indexed_markers[i][1] for i in range(4)]
-
-    # Affichage final
-    img_markers = image.copy()
-    cv2.drawContours(img_markers, markers, -1, (0, 255, 0), 3)
-    # img_show(img_markers, "Marqueurs détectés") # Décommente si ta fonction img_show est définie
-
-    return markers
 
 
 # -----------------------------------------------------
@@ -627,15 +688,44 @@ def detect_student_number(image):
                 cv2.circle(image_with_squares, (x + x_min, y), r, (255, 0, 0), 2)
             
             # Si un cercle suffisamment rempli a été trouvé
+           # Si un cercle suffisamment rempli a été trouvé
             if max_filled_pixels > 50 and best_circle_index is not None:
-                # --- LA MODIFICATION EST ICI ---
-                # L'index 0 devient -1, l'index 1 devient 0, etc.
-                valeur_detectee = best_circle_index - 1
+                
+                chosen_circle = circles_sorted_by_y[best_circle_index]
+                y_cercle = chosen_circle[1]
+                y_carre_centre = y_min + (h / 2.0)
+                
+                # --- 1. L'ESPACEMENT RÉEL (La solution anti-décalage) ---
+                # On calcule l'écart moyen entre les cercles trouvés dans CETTE colonne
+                y_coords = [c[1] for c in circles_sorted_by_y]
+                diffs = np.diff(y_coords)
+                
+                # On ignore les grands écarts si OpenCV a raté un cercle vide au milieu
+                ecarts_valides = [d for d in diffs if h * 0.8 < d < h * 2.0]
+                
+                if len(ecarts_valides) > 0:
+                    espacement = np.median(ecarts_valides)
+                else:
+                    espacement = h * 1.3 # Fallback de sécurité
+                
+                # --- 2. CALCUL DU CHIFFRE EXACT ---
+                # Distance totale entre le centre du carré et notre cercle rempli
+                distance_totale = y_cercle - y_carre_centre
+                
+                # On convertit cette distance en "nombre de sauts"
+                nombre_de_sauts = distance_totale / espacement
+                
+                # D'après les mathématiques de ton PDF ReportLab : 
+                # Le centre du chiffre '0' se trouve toujours à environ 1.15 saut du centre du carré.
+                # Le '1' est à 2.15, le '2' est à 3.15, etc.
+                valeur_detectee = round(nombre_de_sauts - 1.15)
+                
+                # Sécurité pour éviter un bug si un étudiant coche en dehors de la zone
+                valeur_detectee = max(0, min(9, valeur_detectee))
                 
                 student_number += str(valeur_detectee)
                 
-                # Dessiner le cercle choisi en vert et écrire la valeur au-dessus du carré
-                chosen_circle = circles_sorted_by_y[best_circle_index]
+                # Dessiner le cercle choisi en vert et écrire la valeur
                 cv2.circle(image_with_squares, (chosen_circle[0] + x_min, chosen_circle[1]), chosen_circle[2], (0, 255, 0), 4)
                 cv2.putText(image_with_squares, str(valeur_detectee), (x_min, y_min - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
     std_clean = ""
@@ -645,8 +735,8 @@ def detect_student_number(image):
             break
     student_number = std_clean 
 
-    #cv2.imshow("Detection", image_with_squares)
-    #cv2.waitKey(0)
+    cv2.imshow("Detection", image_with_squares)
+    cv2.waitKey(0)
 
     return student_number
         
@@ -673,6 +763,8 @@ def process_pdf_for_students(pdf_path):
         
         # Prétraitement de l'image
         gray, edged = preprocess(page_img)  
+
+        #debug_markers(page_img)
         
         # Détecter les marqueurs triangulaires
         markers = find_markers(edged, page_img)
@@ -713,6 +805,8 @@ def process_pdf_for_students(pdf_path):
         question_circles = detect_sections_columns_and_contours(thresh_img, ansROI)
         student_answers = check_answers(question_circles, ansROI)
         student_results[student_number] = student_answers
+        print(student_number,page_number + 1)
+        #img_show(ansROI, f"Réponses de l'étudiant {student_number} - Page {page_number + 1}", height=800)
 
     return student_results
 
@@ -726,6 +820,6 @@ def process_pdf_for_students(pdf_path):
 # -----------------------------------------------------
 
 # Exemple d'utilisation
-#if __name__ == "__main__":
-#   pdf_path = r"C:\Users\HugoL\Downloads\scan_ccadet_2026-02-16-14-57-33.pdf"
-#   process_pdf_for_students(pdf_path)
+if __name__ == "__main__":
+   pdf_path = r"C:\Users\HugoL\Downloads\scan_apodvin_2026-03-23-10-09-38.pdf"
+   print(process_pdf_for_students(pdf_path))
