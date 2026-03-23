@@ -820,6 +820,6 @@ def process_pdf_for_students(pdf_path):
 # -----------------------------------------------------
 
 # Exemple d'utilisation
-if __name__ == "__main__":
-   pdf_path = r"C:\Users\HugoL\Downloads\scan_apodvin_2026-03-23-10-09-38.pdf"
-   print(process_pdf_for_students(pdf_path))
+#if __name__ == "__main__":
+#   pdf_path = r"C:\Users\HugoL\Downloads\scan_apodvin_2026-03-23-10-09-38.pdf"
+#   print(process_pdf_for_students(pdf_path))
