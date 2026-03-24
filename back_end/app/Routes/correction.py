@@ -361,64 +361,6 @@ def find_markers(edged, image=None):
     return markers
 
 
-def debug_markers(image):
-    """
-    Affiche tous les contours détectés avec leurs statistiques mathématiques
-    pour comprendre pourquoi l'algorithme les rejette.
-    """
-    if image is None:
-        print("Erreur : Aucune image fournie au débogueur.")
-        return
-
-    # On crée une copie pour dessiner dessus
-    debug_img = image.copy()
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Même seuillage que notre fonction principale
-    _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
-    
-    cnts, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    print(f"Débogage : {len(cnts)} contours totaux trouvés sur l'image.")
-    
-    for c in cnts:
-        area = cv2.contourArea(c)
-        
-        # On ignore juste les micro-poussières de moins de 50 pixels pour ne pas polluer l'écran
-        if area > 50:
-            rect = cv2.minAreaRect(c)
-            w, h = rect[1]
-            
-            if w > 0 and h > 0:
-                aspect_ratio = max(w, h) / min(w, h)
-                fill_ratio = area / (w * h)
-                
-                # 1. Dessiner le contour en bleu clair
-                cv2.drawContours(debug_img, [c], -1, (255, 150, 0), 2)
-                
-                # 2. Trouver le centre pour placer le texte
-                M = cv2.moments(c)
-                if M["m00"] != 0:
-                    cx = int(M["m10"] / M["m00"])
-                    cy = int(M["m01"] / M["m00"])
-                else:
-                    cx, cy = int(rect[0][0]), int(rect[0][1])
-                    
-                # 3. Écrire les stats en rouge fluo
-                text_A = f"A: {int(area)}"
-                text_R = f"R: {aspect_ratio:.1f}"
-                text_F = f"F: {fill_ratio:.2f}"
-                
-                # J'utilise une police assez petite pour que ça rentre
-                cv2.putText(debug_img, text_A, (cx - 20, cy - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
-                cv2.putText(debug_img, text_R, (cx - 20, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
-                cv2.putText(debug_img, text_F, (cx - 20, cy + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
-
-    # Sauvegarder l'image sur ton ordinateur pour pouvoir zoomer tranquillement
-    cv2.imwrite("debug_vision_ordi.jpg", debug_img)
-    print("Image sauvegardée sous 'debug_vision_ordi.jpg' dans le dossier de ton script.")
-
-
 
 # -----------------------------------------------------
 # SECTION 4: FONCTIONS DE TRANSFORMATION ET DÉCOUPAGE
@@ -615,7 +557,6 @@ def detect_sections_columns_and_contours(thresh_img, ansROI):
             draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], outline=color, width=2)
 
         question_number += 1
-
     img_pil.save("debug_cercles_finaux.jpg")
     img_bgr = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
     

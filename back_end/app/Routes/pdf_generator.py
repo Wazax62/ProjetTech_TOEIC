@@ -5,6 +5,7 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.graphics.shapes import Drawing, Polygon
 from datetime import datetime
 
+
 def draw_filled_triangle(canvas, x1, y1, x2, y2, x3, y3, fill_color=colors.black):
     drawing = Drawing(width=0, height=0)
     triangle = Polygon([x1, y1, x2, y2, x3, y3])
