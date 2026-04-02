@@ -1,5 +1,13 @@
-# score_routes.py
+import os
+import os
+from reportlab.lib.units import inch
 
+# OUI : L'image doit venir d'ici
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+
+# NON : Ne mettez pas "Image" dans cette ligne !
+from reportlab.graphics.shapes import Drawing, String, Polygon
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from flask import request, jsonify, make_response
 from app import db
 from app.Models.myModels import Etudiant, Groupe, Promotion, Semestre, Site,test_groupe, Test,ReponseEtudiant,ReponseProf,Score
@@ -13,6 +21,47 @@ from io import BytesIO
 from reportlab.lib.styles import ParagraphStyle
 import locale
 from datetime import datetime
+from reportlab.graphics.charts.spider import SpiderChart
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image as PlatypusImage
+from reportlab.graphics.shapes import Drawing, String
+
+
+
+def get_radar_chart(percentages, labels):
+    # Conteneur beaucoup plus compact (180x130)
+    d = Drawing(150,100)
+    
+    ss = SpiderChart()
+    ss.width = 90
+    ss.height = 90
+    ss.x = 45       
+    ss.y = 20        
+    
+    N = len(percentages)
+    ss.data = [percentages, [100]*N, [80]*N, [60]*N, [40]*N, [20]*N]
+    ss.labels = labels
+    
+    # Styles
+    ss.strands[0].fillColor = colors.lightblue
+    ss.strands[0].strokeColor = colors.blue
+    ss.strands[0].strokeWidth = 1.5
+    for i in range(1, 6):
+        ss.strands[i].fillColor = None  
+        ss.strands[i].strokeColor = colors.darkred
+        ss.strands[i].strokeWidth = 0.5
+    
+    d.add(ss)
+    
+    # Textes de l'échelle (police taille 5)
+    center_x = ss.x + (ss.width / 2)
+    center_y = ss.y + (ss.height / 2)
+    radius = ss.height / 2
+    for val in [20, 40, 60, 80, 100]:
+        dist = (val / 100.0) * radius
+        label_y = center_y + dist
+        d.add(String(center_x + 3, label_y - 2, f"{val}%", fontSize=5, fillColor=colors.black))
+    
+    return d
 
 
 
@@ -465,6 +514,22 @@ def init_score_routes(app):
                 elements.append(Paragraph(date_formatee, style_heading))
 
             elements.append(Spacer(1, 0.3 * inch))
+            base_dir = os.path.dirname(__file__)
+            logo_path = os.path.join(base_dir, "..", "..", "..", "src", "assets", "images", "eilco_logo.png")
+            logo_path = os.path.normpath(logo_path)
+
+            if os.path.exists(logo_path):
+
+                logo = Image(logo_path, width=6*inch, height=2.4*inch)
+                logo.hAlign = 'CENTER'
+                    
+                elements.append(logo)
+                elements.append(Spacer(1, 0.2 * inch))
+            else:
+                print(f"⚠️ Logo introuvable : {logo_path}")
+            
+            elements.append(PageBreak())
+
 
  
 
@@ -473,8 +538,8 @@ def init_score_routes(app):
                 score = scores.get(etudiant.id)
                 
                 # Ajouter l'entête de l'étudiant
-                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_normal))
+                elements.append(Spacer(1, 0.1 * inch))
 
                 if score:
                     # Récupérer les réponses de l'étudiant
@@ -492,7 +557,12 @@ def init_score_routes(app):
                         {'nom': 'Partie 4 (Q71-100)', 'debut': 71, 'fin': 100}
                     ]
 
+                    # ... (votre code juste au-dessus)
                     data = [['Partie', 'Questions Correctes', 'Total Questions', 'Pourcentage']]
+                    
+                    # --- NOUVEAU : On prépare nos listes pour le graphique ---
+                    pct_list = []
+                    labels_list = ['Part 1', '     Part 2', 'Part 3', 'Part 4     ']
                     
                     for partie in parties:
                         bonnes_reponses = sum(
@@ -500,41 +570,65 @@ def init_score_routes(app):
                             if reponses_etudiant_dict.get(q) == reponses_prof.get(q)
                         )
                         total = partie['fin'] - partie['debut'] + 1
+                        pourcentage = (bonnes_reponses / total) * 100
+                        
+                        # On stocke le pourcentage pour le graphique
+                        pct_list.append(pourcentage)
+                        
                         data.append([
                             partie['nom'],
                             str(bonnes_reponses),
                             str(total),
-                            f"{(bonnes_reponses/total)*100:.1f}%"
+                            f"{pourcentage:.1f}%"
                         ])
 
-                    # Ajouter les totaux
+                    # Ajouter les totaux au tableau
                     data.append(['TOTAL ORAL', str(score.h2_oral), '100', f"{score.h2_oral}%"])
-                    data.append(['SCORE TOEIC ORAL', str(score.score_oral), '', ''])
+                    data.append(['SCORE TOEIC ORAL', '', '', str(score.score_oral)])
 
-                    # Créer le tableau
-                    table = Table(data)
-                    table.setStyle(TableStyle([
-                        ('BACKGROUND', (0,0), (-1,0), colors.grey),
-                        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-                        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-                        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-                        ('BOTTOMPADDING', (0,0), (-1,0), 12),
-                        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
-                        ('GRID', (0,0), (-1,-1), 1, colors.black),
-                        ('SPAN', (0,-1), (1,-1)),
-                        ('BACKGROUND', (0,-2), (-1,-2), colors.lightgrey),
-                        ('BACKGROUND', (0,-1), (-1,-1), colors.lightblue),
+
+
+                # 3. Le tableau des scores (compact)
+                    table_scores = Table(data, rowHeights=14)
+                    table_scores.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.grey),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0,0), (-1,-1), 7), 
+                    ('TOPPADDING', (0,0), (-1,-1), 1),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+                    ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+                    ('SPAN', (0,-1), (1,-1)),
+                    ('BACKGROUND', (0,-2), (-1,-2), colors.lightgrey),
+                    ('BACKGROUND', (0,-1), (-1,-1), colors.lightblue),
                     ]))
-                    elements.append(table)
                 
-                elements.append(Spacer(1, 0.5 * inch))
-
+                # 4. Le diagramme radar miniature
+                    radar = get_radar_chart(pct_list, labels_list)
+                
+                # 5. La disposition Côte à Côte (Tableau à gauche, Radar à droite)
+                    layout_table = Table([[table_scores,"", radar]], colWidths=[3.0*inch, 2.5*inch])
+                    layout_table.setStyle(TableStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('ALIGN', (0,0), (0,0), 'LEFT'),
+                    ('ALIGN', (1,0), (1,0), 'RIGHT'),
+                    ]))
+                
+                    elements.append(layout_table)
+            
+            # Ligne de séparation au lieu d'un saut de page
+                elements.append(Spacer(1, 0.1))
+                ligne = Table([['']], colWidths=[6.5*inch], style=[('LINEBELOW', (0,0), (-1,-1), 1, colors.black)])
+                elements.append(ligne)
+                elements.append(Spacer(1, 0.1))
             # Traiter les étudiants absents
             for etudiant in etudiants_absents:
                 elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Spacer(1, 00.1))
                 elements.append(Paragraph("La feuille de cette élève n'a pas encore été scannée", style_absent))
-                elements.append(Spacer(1, 0.5 * inch))
+                elements.append(Spacer(1, 0.1))
 
             # Générer le PDF
             doc.build(elements)
@@ -653,6 +747,21 @@ def init_score_routes(app):
                 elements.append(Paragraph(date_formatee, style_heading))
 
             elements.append(Spacer(1, 0.3 * inch))
+            base_dir = os.path.dirname(__file__)
+            logo_path = os.path.join(base_dir, "..", "..", "..", "src", "assets", "images", "eilco_logo.png")
+            logo_path = os.path.normpath(logo_path)
+
+            if os.path.exists(logo_path):
+                logo = Image(logo_path, width=6*inch, height=2.4*inch)
+                logo.hAlign = 'CENTER'
+                    
+                elements.append(logo)
+                elements.append(Spacer(1, 0.1))
+            else:
+                print(f"⚠️ Logo introuvable : {logo_path}")
+                # --- FIN LOGO ---
+
+            elements.append(PageBreak())
 
 
 
@@ -661,8 +770,8 @@ def init_score_routes(app):
                 score = scores.get(etudiant.id)
                 
                 # Ajouter l'entête de l'étudiant
-                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_normal))
+                elements.append(Spacer(1, 0.1))
 
                 if score:
                     # Récupérer les réponses de l'étudiant
@@ -679,7 +788,12 @@ def init_score_routes(app):
                         {'nom': 'Partie 7 (Q147-200)', 'debut': 147, 'fin': 200}
                     ]
 
+                    # ... (votre code juste au-dessus)
                     data = [['Partie', 'Questions Correctes', 'Total Questions', 'Pourcentage']]
+                    
+                    # --- NOUVEAU : On prépare nos listes pour le graphique ---
+                    pct_list = []
+                    labels_list = ['Part 5', 'Part 6', 'Part 7']
                     
                     for partie in parties:
                         bonnes_reponses = sum(
@@ -687,41 +801,63 @@ def init_score_routes(app):
                             if reponses_etudiant_dict.get(q) == reponses_prof.get(q)
                         )
                         total = partie['fin'] - partie['debut'] + 1
+                        pourcentage = (bonnes_reponses / total) * 100
+                        
+                        # On stocke le pourcentage pour le graphique
+                        pct_list.append(pourcentage)
+                        
                         data.append([
                             partie['nom'],
                             str(bonnes_reponses),
                             str(total),
-                            f"{(bonnes_reponses/total)*100:.1f}%"
+                            f"{pourcentage:.1f}%"
                         ])
 
-                    # Ajouter les totaux
+                    # Ajouter les totaux au tableau
                     data.append(['TOTAL ÉCRIT', str(score.h2_ecrit), '100', f"{score.h2_ecrit}%"])
-                    data.append(['SCORE TOEIC ÉCRIT', str(score.score_ecrit), '', ''])
+                    data.append(['SCORE TOEIC ÉCRIT','','',  str(score.score_ecrit)])
 
-                    # Créer le tableau
-                    table = Table(data)
-                    table.setStyle(TableStyle([
-                        ('BACKGROUND', (0,0), (-1,0), colors.grey),
-                        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-                        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-                        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-                        ('BOTTOMPADDING', (0,0), (-1,0), 12),
-                        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
-                        ('GRID', (0,0), (-1,-1), 1, colors.black),
-                        ('SPAN', (0,-1), (1,-1)),
-                        ('BACKGROUND', (0,-2), (-1,-2), colors.lightgrey),
-                        ('BACKGROUND', (0,-1), (-1,-1), colors.lightblue),
+                # 3. Le tableau des scores (compact)
+                    table_scores = Table(data, rowHeights=14)
+                    table_scores.setStyle(TableStyle([
+                    ('BACKGROUND', (0,0), (-1,0), colors.grey),
+                    ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0,0), (-1,-1), 7), 
+                    ('TOPPADDING', (0,0), (-1,-1), 1),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 1),
+                    ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+                    ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+                    ('SPAN', (0,-1), (1,-1)),
+                    ('BACKGROUND', (0,-2), (-1,-2), colors.lightgrey),
+                    ('BACKGROUND', (0,-1), (-1,-1), colors.lightblue),
                     ]))
-                    elements.append(table)
                 
-                elements.append(Spacer(1, 0.5 * inch))
-
+                # 4. Le diagramme radar miniature
+                    radar = get_radar_chart(pct_list, labels_list)
+                
+                # 5. La disposition Côte à Côte (Tableau à gauche, Radar à droite)
+                    layout_table = Table([[table_scores,"", radar]], colWidths=[3.0*inch, 2.5*inch])
+                    layout_table.setStyle(TableStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                    ('ALIGN', (0,0), (0,0), 'LEFT'),
+                    ('ALIGN', (1,0), (1,0), 'RIGHT'),
+                    ]))
+                
+                    elements.append(layout_table)
+            
+            # Ligne de séparation au lieu d'un saut de page
+                elements.append(Spacer(1, 0.1))
+                ligne = Table([['']], colWidths=[6.5*inch], style=[('LINEBELOW', (0,0), (-1,-1), 1, colors.black)])
+                elements.append(ligne)
+                elements.append(Spacer(1, 0.1))
             # Traiter les étudiants absents
             for etudiant in etudiants_absents:
                 elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Spacer(1, 00.1))
                 elements.append(Paragraph("La feuille de cette élève n'a pas encore été scannée", style_absent))
-                elements.append(Spacer(1, 0.5 * inch))
+                elements.append(Spacer(1, 0.1))
 
             # Générer le PDF
             doc.build(elements)

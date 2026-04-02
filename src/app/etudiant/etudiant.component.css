@@ -10,14 +10,17 @@ body {
 }
 
 .container {
-  max-width: 1400px !important;
-  margin: 0 auto;
+  max-width: 1600px !important;
+  margin: 0 auto !important; /* Le !important tue la marge invisible du "my-5" */
   padding-top: 110px !important;
-  padding-bottom: 50px;
+  padding-bottom: 20px !important; 
   padding-left: 20px;
   padding-right: 20px;
   background: transparent !important;
   box-shadow: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 100vh !important; 
 }
 
 .title {
@@ -129,8 +132,9 @@ body {
 
 .grid-card-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 30px;
+  margin-bottom: 40px;
 }
 
 .fancy-card {
@@ -138,7 +142,7 @@ body {
   border-radius: 20px;
   border: 1px solid rgba(0,0,0,0.03);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  padding: 25px;
+  padding: 20px; 
   display: flex;
   flex-direction: column;
   position: relative;
@@ -175,7 +179,7 @@ body {
 }
 
 .card-title {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #004e92;
   margin: 0 0 15px 0;
@@ -248,7 +252,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 40px;
+  margin-top: auto !important; 
+  margin-bottom: 0 !important; 
   background: white;
   padding: 15px 25px;
   border-radius: 16px;
@@ -318,4 +323,39 @@ body {
     flex-direction: column;
     gap: 15px;
   }
+}
+
+.search-filters {
+  display: flex;
+  align-items: center;
+}
+
+.form-select {
+  appearance: none; 
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 12px 40px 12px 20px; 
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 4, 80, 0.04);
+  
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23aaa'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 30px;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15); 
+  transform: translateY(-2px);
+}
+
+.form-select:hover {
+  border-color: #007bff;
 }

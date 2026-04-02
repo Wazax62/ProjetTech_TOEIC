@@ -4,13 +4,18 @@
   <h1 class="title">Liste des Étudiants</h1>
   
   <div class="search-bar">
-    <input type="text" [(ngModel)]="searchText" placeholder="Rechercher un étudiant, une spécialité, un site..." />
+    <input type="text" 
+           [(ngModel)]="searchText" 
+           (ngModelChange)="currentPage = 1" 
+           placeholder="Rechercher un étudiant, une spécialité, un site..." />
   </div>
   
   <div class="action-row">
-    
     <div class="search-filters">
-      <select class="form-select" [(ngModel)]="selectedGroupe" style="min-width: 200px; padding: 8px; border-radius: 5px;">
+      <select class="form-select" 
+              [(ngModel)]="selectedGroupe" 
+              (ngModelChange)="currentPage = 1" 
+              style="min-width: 200px; padding: 8px; border-radius: 5px;">
         <option value="">Tous les groupes</option>
         <option *ngFor="let groupe of groupes" [value]="groupe.nom">
           {{ groupe.nom }}

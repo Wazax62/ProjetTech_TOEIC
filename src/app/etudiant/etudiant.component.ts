@@ -24,7 +24,7 @@ export class EtudiantComponent implements OnInit {
   selectedGroupe: string = ''; // <-- Stocke le nom du groupe sélectionné
   
   currentPage: number = 1;
-  itemsPerPage: number = 15;
+  itemsPerPage: number = 18;
 
   constructor(
     private etudiantService: EtudiantService,
@@ -97,12 +97,19 @@ export class EtudiantComponent implements OnInit {
     });
   }
 
-  // Étape finale : appliquer la pagination sur la liste déjà filtrée
+// Étape finale : appliquer la pagination en comblant les espaces vides
   get filteredStudents() {
-    return this.baseFilteredStudents.slice(
-      (this.currentPage - 1) * this.itemsPerPage,
-      this.currentPage * this.itemsPerPage
-    );
+    const filtered = this.baseFilteredStudents;
+    const total = filtered.length;
+    if (total === 0) return [];
+    let startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    let endIndex = startIndex + this.itemsPerPage;
+    if (endIndex > total) {
+      endIndex = total;
+      startIndex = Math.max(0, total - this.itemsPerPage);
+    }
+
+    return filtered.slice(startIndex, endIndex);
   }
 
   // Le nombre de pages s'adapte dynamiquement selon les filtres
