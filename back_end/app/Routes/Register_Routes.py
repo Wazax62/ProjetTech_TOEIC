@@ -57,7 +57,6 @@ def register_routes(app):
         try:
             # Récupération des données envoyées par le client
             data = request.get_json()
-            print("Données reçues:", data)
 
             # Extraction des données spécifiques
             nom = data.get('firstName')

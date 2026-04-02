@@ -756,7 +756,7 @@ def init_score_routes(app):
                 logo.hAlign = 'CENTER'
                     
                 elements.append(logo)
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Spacer(1, 0.1))
             else:
                 print(f"⚠️ Logo introuvable : {logo_path}")
                 # --- FIN LOGO ---
@@ -770,8 +770,8 @@ def init_score_routes(app):
                 score = scores.get(etudiant.id)
                 
                 # Ajouter l'entête de l'étudiant
-                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.2 * inch))
+                elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_normal))
+                elements.append(Spacer(1, 0.1))
 
                 if score:
                     # Récupérer les réponses de l'étudiant
@@ -817,7 +817,7 @@ def init_score_routes(app):
                     data.append(['TOTAL ÉCRIT', str(score.h2_ecrit), '100', f"{score.h2_ecrit}%"])
                     data.append(['SCORE TOEIC ÉCRIT','','',  str(score.score_ecrit)])
 
-                    # Créer et styliser le tableau
+                # 3. Le tableau des scores (compact)
                     table_scores = Table(data, rowHeights=14)
                     table_scores.setStyle(TableStyle([
                     ('BACKGROUND', (0,0), (-1,0), colors.grey),
@@ -846,7 +846,8 @@ def init_score_routes(app):
                     ]))
                 
                     elements.append(layout_table)
-             # Ligne de séparation au lieu d'un saut de page
+            
+            # Ligne de séparation au lieu d'un saut de page
                 elements.append(Spacer(1, 0.1))
                 ligne = Table([['']], colWidths=[6.5*inch], style=[('LINEBELOW', (0,0), (-1,-1), 1, colors.black)])
                 elements.append(ligne)
@@ -854,9 +855,9 @@ def init_score_routes(app):
             # Traiter les étudiants absents
             for etudiant in etudiants_absents:
                 elements.append(Paragraph(f"Étudiant: {etudiant.nom} {etudiant.prenom}", style_heading))
-                elements.append(Spacer(1, 0.1 * inch))
+                elements.append(Spacer(1, 00.1))
                 elements.append(Paragraph("La feuille de cette élève n'a pas encore été scannée", style_absent))
-                elements.append(Spacer(1, 0.1 * inch))
+                elements.append(Spacer(1, 0.1))
 
             # Générer le PDF
             doc.build(elements)
