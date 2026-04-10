@@ -1,6 +1,6 @@
 # etudiant_routes.py
 
-from flask import request, jsonify
+from flask import app, request, jsonify
 import pandas as pd
 from app import db
 from app.Models.myModels import Etudiant, Promotion, Groupe, Site, Semestre
@@ -106,69 +106,57 @@ def init_etudiant_routes(app):
         if 'file' not in request.files:
             app.logger.error("Aucun fichier trouvé dans la requête.")
             return jsonify({"error": "Aucun fichier trouvé"}), 400
+        
         file = request.files['file']
         if file.filename == '':
             app.logger.error("Le fichier est vide (pas de nom).")
             return jsonify({"error": "Aucun fichier sélectionné"}), 400
+            
         try:
             app.logger.info(f"Lecture du fichier : {file.filename}")
             df = pd.read_excel(file)
             app.logger.info("Fichier chargé avec succès.")
             
-            # Afficher les colonnes du fichier
             app.logger.info(f"Colonnes du fichier : {df.columns.tolist()}")
             
-            required_columns = ["nom", "prenom", "promotion", "groupe", "site", "Semestre", "specialite"]
+            required_columns = ["nom", "prenom", "groupe", "site", "specialite"]
+            
             if not all(column in df.columns for column in required_columns):
                 missing_cols = [column for column in required_columns if column not in df.columns]
                 app.logger.error(f"Colonnes manquantes dans le fichier : {', '.join(missing_cols)}")
                 return jsonify({"error": f"Le fichier doit contenir les colonnes suivantes: {', '.join(required_columns)}"}), 400
 
             for index, row in df.iterrows():
-                app.logger.info(f"Vérification des données pour la ligne : {row}")
-                promotion = Promotion.query.filter_by(nom=row["promotion"]).first()
+                app.logger.info(f"Vérification des données pour la ligne : {row.to_dict()}")
+                
+                # On recherche uniquement le groupe et le site
                 groupe = Groupe.query.filter_by(nom=row["groupe"]).first()
                 site = Site.query.filter_by(nom=row["site"]).first()
                 
-                if not promotion:
-                    app.logger.error(f"Promotion non trouvée pour : {row['promotion']}")
                 if not groupe:
                     app.logger.error(f"Groupe non trouvé pour : {row['groupe']}")
                 if not site:
                     app.logger.error(f"Site non trouvé pour : {row['site']}")
 
-                if not promotion or not groupe or not site:
-                    app.logger.error(f"Données invalides dans la ligne : {row}")
-                    return jsonify({"error": f"Données invalides dans la ligne : {row}"}), 400
+                if not groupe or not site:
+                    app.logger.error(f"Données invalides dans la ligne : {row.to_dict()}")
+                    return jsonify({"error": f"Le site ou le groupe est introuvable pour la ligne : {row['nom']} {row['prenom']}"}), 400
 
-                # 🔹 Récupération du Semestre ID en fonction de la promotion et du site
-                semestre = Semestre.query.filter_by(nom=row["Semestre"], promotion_id=promotion.id).first()
-                if not semestre:
-                    app.logger.error(f"Semestre non trouvé pour : {row['Semestre']} (promotion: {row['promotion']}, site: {row['site']})")
-                    return jsonify({"error": f"Semestre non trouvé pour : {row['Semestre']}"}), 400
-
-                # Vérifier si l'étudiant existe déjà
-                # existing_student = Etudiant.query.filter_by(email=row["email"]).first()
-                # if existing_student:
-                #     app.logger.info(f"Étudiant déjà existant : {row['email']}")
-                #     continue  # ou retournez une erreur si nécessaire
-
-                # 🔹 Insertion de l'étudiant avec le `semestre_id`
                 etudiant = Etudiant(
                     nom=row["nom"],
                     prenom=row["prenom"],
-                    promotion_id=promotion.id,
+                    promotion_id=groupe.promotion_id,
                     groupe_id=groupe.id,
-                    site_id=site.id,
-                    semestre_id=semestre.id,  # Ajout du semestre_id récupéré
+                    site_id=groupe.site.id,
+                    semestre_id=groupe.semestre_id,
                     specialite=row["specialite"],
-                    # email=row["email"]
                 )
                 db.session.add(etudiant)
 
             db.session.commit()
             app.logger.info("Étudiants importés avec succès.")
             return jsonify({"message": "Étudiants importés avec succès"}), 200
+            
         except Exception as e:
             app.logger.error(f"Erreur lors du traitement du fichier : {str(e)}")
             db.session.rollback()

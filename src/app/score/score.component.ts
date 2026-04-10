@@ -39,7 +39,8 @@ export class ScoreComponent implements OnInit {
       const semestreId = this.selectedSemestreId;
       const testId = (document.getElementById('testFilter') as HTMLSelectElement).value;
 
-      if (!siteId || !promotionId || !groupeId || !semestreId || !testId) {
+      // Ajout de la vérification contre la chaîne 'undefined' ou chaîne vide
+      if (!siteId || !promotionId || !groupeId || !semestreId || !testId || testId === 'undefined' || testId === 'null' || testId === '') {
         alert('Veuillez sélectionner tous les filtres (site, promotion, semestre, groupe et test)');
         return;
       }
@@ -49,17 +50,24 @@ export class ScoreComponent implements OnInit {
       );
 
       if (!response.ok) {
-        throw new Error('Erreur lors du calcul des scores');
+        // LECTURE DE LA VRAIE ERREUR DU BACKEND
+        let errorMsg = 'Erreur lors du calcul des scores';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorData.message || errorMsg;
+        } catch (e) {
+          // Impossible de parser le JSON
+        }
+        throw new Error(`Erreur serveur (${response.status}) : ${errorMsg}`);
       }
 
       this.students = await response.json();
       this.showTable = true;
     } catch (error) {
       console.error('Erreur:', error);
-      alert('Une erreur est survenue lors du calcul des scores');
+      alert(error instanceof Error ? error.message : 'Une erreur est survenue lors du calcul des scores');
     }
   }
-
   // Méthode pour télécharger le PDF Oral
   downloadOralPDF(): void {
     if (!this.validateFilters()) return;
